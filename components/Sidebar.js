@@ -7,33 +7,36 @@ import { HomeIcon,
     Bars3Icon,
     ChatBubbleOvalLeftEllipsisIcon} from '@heroicons/react/24/outline'
 
-//245X454
 function Sidebar() {
-    return <div className="relative shadow-sm border-r bg-white h-screen w-60">
+    return ( 
+    <div className='Sidebar'>
+        <div className="float-left shadow-sm border-r bg-white h-screen w-60">
 
-        <div className='webName'>
-            {/* <img className='icon' src="./fire.png" alt='logo'/> */}
-            <p className='animate-text mt-6 mb-6' >InTouch</p>
-        </div>
+            <div className='webName'>
+                {/* <img className='icon' src="./fire.png" alt='logo'/> */}
+                <p className='animate-text mt-6 mb-6' >InTouch</p>
+            </div>
 
-        <div className='flex flex-col'>
-            <SidebarOption Icon={HomeIcon} Title="Home" />
-            <SidebarOption Icon={MagnifyingGlassIcon} Title="Search" />
-            <SidebarOption Icon={ChatBubbleOvalLeftEllipsisIcon} Title="Messages" />
-            <SidebarOption Icon={HeartIcon} Title="Notifications" />
-            <SidebarOption Icon={PlusCircleIcon} Title="Create" />
-            
-            <div className='navBtn m-4 h-10'>
-                <img src="https://assets-prd.ignimgs.com/2023/01/04/trigunstampedeexclusiveclip-ign-blogroll-1672791267600.jpg"
-                alt="profile" className='h-7 w-7 rounded-full cursor-pointer object-cover'/>
-                <h3>Profile</h3>
+            <div className='flex flex-col'>
+                <SidebarOption Icon={HomeIcon} Title="Home" />
+                <SidebarOption Icon={MagnifyingGlassIcon} Title="Search" />
+                <SidebarOption Icon={ChatBubbleOvalLeftEllipsisIcon} Title="Messages" />
+                <SidebarOption Icon={HeartIcon} Title="Notifications" />
+                <SidebarOption Icon={PlusCircleIcon} Title="Create" />
+                
+                <div className='navBtn m-4 h-10'>
+                    <img src="https://assets-prd.ignimgs.com/2023/01/04/trigunstampedeexclusiveclip-ign-blogroll-1672791267600.jpg"
+                    alt="profile" className='h-7 w-7 rounded-full cursor-pointer object-cover'/>
+                    <h3>Profile</h3>
+                </div>
+
+            </div>
+            <div className="fixed bottom-0">
+                <SidebarOption Icon={Bars3Icon} Title="Menu"  />
             </div>
         </div>
-
-        <div className="absolute bottom-0 w-full">
-            <SidebarOption Icon={Bars3Icon} Title="Menu"  />
-        </div>
     </div>
+    )
 }
 
 export default Sidebar

@@ -7,11 +7,22 @@
         @apply h-6 inline-flex cursor-pointer text-lg space-x-2 w-52
         hover:scale-105 transition-all duration-150 ease-out
     }
+
+    .postBtn{
+      @apply h-7 hover:scale-125 cursor-pointer transition-all
+      duration-150 ease-out;
+    }
 }
 
 @font-face{
     font-family: MetaSans;
     src: url('../MetaSans.ttf')
+}
+
+.Sidebar{
+  position: -webkit-sticky;
+  position: sticky;
+  top:0;
 }
 
 .webName{
