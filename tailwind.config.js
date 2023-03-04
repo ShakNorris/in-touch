@@ -6,7 +6,11 @@ module.exports = {
     './app/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors:{
+        'intouch': '#BFF098'
+      },
+    },
   },
   plugins: [
     require("@tailwindcss/forms"), require("tailwind-scrollbar"),

@@ -24,6 +24,11 @@
   position: sticky;
   top:0;
 }
+/* 
+.border-color {
+  border-image: linear-gradient(to right,#6FD6FF, #BFF098) 1;
+  border: 5px solid transparent;
+} */
 
 .webName{
     padding-left:15px;
