@@ -6,8 +6,14 @@ import { HomeIcon,
     HeartIcon,
     Bars3Icon,
     ChatBubbleOvalLeftEllipsisIcon} from '@heroicons/react/24/outline'
+import { useSession } from 'next-auth/react';
 
 function Sidebar() {
+
+    const {data: session} = useSession();
+
+    console.log(session);
+
     return ( 
     <div className='Sidebar'>
         <div className="float-left shadow-sm border-r bg-white h-screen w-60">
@@ -25,8 +31,8 @@ function Sidebar() {
                 <SidebarOption Icon={PlusCircleIcon} Title="Create" />
                 
                 <div className='navBtn m-4 h-10'>
-                    <img src="https://assets-prd.ignimgs.com/2023/01/04/trigunstampedeexclusiveclip-ign-blogroll-1672791267600.jpg"
-                    alt="profile" className='h-7 w-7 rounded-full cursor-pointer object-cover'/>
+                    <img src= {session?.user?.image}
+                    alt="pfp" className='h-7 w-7 rounded-full cursor-pointer object-cover'/>
                     <h3>Profile</h3>
                 </div>
 
