@@ -1,7 +1,8 @@
 import { getProviders, signIn } from "next-auth/react"
 import style from '../../styles/authen.module.css'
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from 'next-auth/react';
+import { getSession } from 'next-auth/react';
 
 
 export default function login({ providers }) {
@@ -11,6 +12,15 @@ export default function login({ providers }) {
   const {data: session} = useSession();
 
   console.log(session);
+
+  useEffect(() => {
+    if(session){
+      router.push({
+        pathname: "/"
+      })
+    }
+    return () => {};
+  }, []);
 
   return (
     <>
@@ -53,10 +63,20 @@ export default function login({ providers }) {
 
 // This is the recommended way for Next.js 9.3 or newer
 export async function getServerSideProps(context) {
+  const session = await getSession(context);
+  if(session){
+    return {
+      redirect: {
+        destination: '/',
+      },
+    };
+  }
+
   const providers = await getProviders()
   return {
     props: { providers },
   }
+
 }
 
 /*
