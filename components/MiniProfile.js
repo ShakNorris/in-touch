@@ -5,6 +5,7 @@ import { signOut } from 'next-auth/react';
 function MiniProfile() {
   const {data: session} = useSession();
 
+
   return (
     <div className='flex items-center justify-between mt-[-25px] ml-10'>
         <img src={session?.user?.image}

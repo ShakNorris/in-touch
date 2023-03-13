@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Header from '../components/Header'
 import Sidebar from '../components/Sidebar'
 import Feed from '../components/Feed'
+import Modal from '../components/Modal'
 import { getSession } from 'next-auth/react'
 
 
@@ -16,6 +17,8 @@ export default function Home() {
       
       <Sidebar />
       <Feed />
+
+      <Modal />
     </div>
   )
 } 

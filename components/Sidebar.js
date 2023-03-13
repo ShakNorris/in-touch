@@ -7,12 +7,16 @@ import { HomeIcon,
     Bars3Icon,
     ChatBubbleOvalLeftEllipsisIcon} from '@heroicons/react/24/outline'
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/dist/client/router';
+import {useRecoilState} from 'recoil';
+import {modalState} from '../atoms/modalAtom';
 
 function Sidebar() {
 
     const {data: session} = useSession();
-
-    console.log(session)
+    const router = useRouter();
+    const [open, setOpen] = useRecoilState(modalState);
+    //const open = useRecoilValue(modalState)
 
     return ( 
     <div className='Sidebar'>
@@ -26,9 +30,9 @@ function Sidebar() {
             <div className='flex flex-col'>
                 <SidebarOption Icon={HomeIcon} Title="Home" />
                 <SidebarOption Icon={MagnifyingGlassIcon} Title="Search" />
-                <SidebarOption Icon={ChatBubbleOvalLeftEllipsisIcon} Title="Messages" />
+                <SidebarOption func={() => router.push('/chat')} Icon={ChatBubbleOvalLeftEllipsisIcon} Title="Messages" />
                 <SidebarOption Icon={HeartIcon} Title="Notifications" />
-                <SidebarOption Icon={PlusCircleIcon} Title="Create" />
+                <SidebarOption func={() => setOpen(true)}Icon={PlusCircleIcon} Title="Create" />
                 
                 <div className='navBtn m-4 h-10'>
                     <img src= {session?.user?.image}

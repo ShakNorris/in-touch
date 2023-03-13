@@ -1,5 +1,7 @@
 import { faker } from '@faker-js/faker'
-import React from 'react'
+import {db} from '../firebase'
+import {query, collection, onSnapshot, orderBy } from 'firebase/firestore';
+import React, { useState, useEffect } from 'react'
 import Post from './Post'
 
 const temp_data = [
@@ -20,8 +22,20 @@ const temp_data = [
 ]
 
 function Posts() {
+
+  const [posts, setPosts] = useState();
+
+  useEffect(() =>
+    onSnapshot(query(collection(db, 'Posts'), orderBy('timestamp','desc')), snapshot => {
+      setPosts(snapshot.docs);
+    }), [db])
+
   return (
     <div>
+         {posts?.map((post)=>(
+        <Post key={post.id} id={post.id} username={post.data().username} 
+        userImg = {post.data().avatar} img ={post.data().image} caption={post.data().caption}/>
+        ))}
         {temp_data.map((post)=>(
         <Post key={post.id} id={post.id} username={post.username} 
         userImg = {post.avatar} img ={post.img} caption={post.caption}/>
