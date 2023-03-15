@@ -12,13 +12,13 @@ const temp_data = [
         img: 'https://i.ytimg.com/vi/pAt2f0GQhtw/maxresdefault.jpg',
         caption: "This is DOPE"
     },
-    {
-        id: '2',
-        username: 'another fella',
-        avatar: faker.image.avatar(),
-        img: 'https://i.ytimg.com/vi/pAt2f0GQhtw/maxresdefault.jpg',
-        caption: "This is DOPE"
-    }
+    // {
+    //     id: '2',
+    //     username: 'another fella',
+    //     avatar: faker.image.avatar(),
+    //     img: 'https://i.ytimg.com/vi/pAt2f0GQhtw/maxresdefault.jpg',
+    //     caption: "This is DOPE"
+    // }
 ]
 
 function Posts() {

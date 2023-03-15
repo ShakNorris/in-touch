@@ -62,6 +62,38 @@ function Modal() {
         }
     }
 
+    const dragOver = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "copy";
+        e.stopPropagation()
+    }
+    
+    const dragEnter = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    const dragLeave = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    const fileDrop = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log()
+
+        const reader = new FileReader();
+        if(e.dataTransfer.files[0]){
+            reader.readAsDataURL(e.dataTransfer.files[0]);
+        }
+
+        reader.onload = (readerEvent) => {
+            setSelectedFile(readerEvent.target.result)
+        }
+    }
+
+
   return (
     <Transition.Root show={open} as={Fragment}>
         <Dialog
@@ -90,7 +122,10 @@ function Modal() {
                 leaveTo='opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'
                 >
                     <div className='w-[600px] inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm-w-full sm:p-6'>
-                        <div>
+                        <div onDragOver={dragOver}
+                            onDragEnter={dragEnter}
+                            onDragLeave={dragLeave}
+                            onDrop={fileDrop}>
 
                             {selectedFile ? (
                                 <img
@@ -101,7 +136,8 @@ function Modal() {
                             ): (<div className='mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 cursor-pointer'
                             onClick={() => chooseFileRef.current.click()}>
                                 <CameraIcon className='h-6 w-6 text-blue-700'
-                                aria-hidden='true' />
+                                aria-hidden='true'
+                                />
                             </div>)
                             }
 
