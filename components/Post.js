@@ -10,13 +10,23 @@ import { useSession } from 'next-auth/react';
 import { addDoc, deleteDoc ,getDocs, setDoc, doc, query, collection, onSnapshot, orderBy, serverTimestamp } from 'firebase/firestore';
 import {db, storage} from '../firebase'
 import Moment from 'react-moment';
+import data from '@emoji-mart/data'
+import Picker from '@emoji-mart/react'
 
-function Post({id, username, userImg, img, caption, timeStamp}) {
+
+function Post({id, username, userImg, img, caption, timeStamp, emojiPicker}) {
     const {data: session} = useSession();
     const [comment, setComment] = useState('');
     const [comments, setComments] = useState([]);
     const [likes, setLikes] = useState([]);
     const [hasLiked, setHasLiked] = useState(false)
+    const [showEmojis, setShowEmojis] = useState(false);
+
+    const ShowEmojis = () => {
+        if(showEmojis == false) 
+           return setShowEmojis(true);
+        return setShowEmojis(false)
+    }
 
     const commentCollectionRef = collection(db, 'Posts', id, 'Comments');
     
@@ -62,8 +72,16 @@ function Post({id, username, userImg, img, caption, timeStamp}) {
      , [likes]
      )
 
+    const addEmoji = (e) => {
+        let sym = e.unified.split("-");
+        let codesArray = [];
+        sym.forEach((el) => codesArray.push("0x" + el));
+        let emoji = String.fromCodePoint(...codesArray);
+        setComment(comment + emoji)
+    };
+
   return (
-    <div className='bg-white my-5 border rounded-sm'>
+    <div className='relative bg-white my-5 border rounded-sm'>
         <div className='flex items-center p-5'>
             <img className='rounded-full h-8 w-8 object-contain
             border p-1 mr-3' src={userImg} alt=""/>
@@ -121,7 +139,7 @@ function Post({id, username, userImg, img, caption, timeStamp}) {
         {/* )} */}
 
         <form className='flex items-center p-4'>
-            <FaceSmileIcon className='h-5 w-5'/>
+            <FaceSmileIcon className='h-5 w-5' onClick={ShowEmojis}/>
             <input type='text'
             value={comment}
             onChange={e => setComment(e.target.value)}
@@ -131,6 +149,12 @@ function Post({id, username, userImg, img, caption, timeStamp}) {
             onClick={sendComment}
             className='font-semibold text-blue-500'>Post</button>
         </form>
+
+        {showEmojis && 
+            <div className='emojiPlacement'>
+                <Picker data={data} onEmojiSelect={addEmoji} theme='light'/>
+            </div>
+        }
     </div>
   )
 }

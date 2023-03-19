@@ -4,6 +4,7 @@ import {query, collection, onSnapshot, orderBy } from 'firebase/firestore';
 import React, { useState, useEffect } from 'react'
 import Post from './Post'
 
+
 const temp_data = [
     // {
     //     id: '1',
@@ -20,6 +21,8 @@ const temp_data = [
     //     caption: "This is DOPE"
     // }
 ]
+
+
 
 function Posts() {
 

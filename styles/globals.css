@@ -12,6 +12,10 @@
       @apply h-7 hover:scale-125 cursor-pointer transition-all
       duration-150 ease-out;
     }
+
+    .emojiPlacement{
+      @apply absolute z-10 bottom-[55px] left-[5px];
+    }
 }
 
 @font-face{

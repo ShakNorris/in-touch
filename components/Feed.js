@@ -3,6 +3,8 @@ import Stories from './Stories'
 import Posts from './Posts'
 import MiniProfile from './MiniProfile'
 import Suggestions from './Suggestions'
+import data from '@emoji-mart/data'
+import Picker from '@emoji-mart/react'
 
 function Feed() {
   return (
@@ -17,6 +19,7 @@ function Feed() {
             <div className='fixed top-20'>
                 <MiniProfile/>
                 <Suggestions />
+                
             </div>
         </section>
     </main>
