@@ -1,29 +1,36 @@
-import React from 'react'
-import Stories from './Stories'
-import Posts from './Posts'
-import MiniProfile from './MiniProfile'
-import Suggestions from './Suggestions'
-import data from '@emoji-mart/data'
-import Picker from '@emoji-mart/react'
+import React, { useEffect } from "react";
+import Stories from "./Stories";
+import Posts from "./Posts";
+import MiniProfile from "./MiniProfile";
+import Suggestions from "./Suggestions";
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
+import { db, storage } from "../firebase";
 
 function Feed() {
   return (
-    <main className='grid grid-cols-1 md:grid-cols-2 md:max-w-3xl 
-    xl:grid-cols-3 xl:max-w-6xl mx-auto'>
-        <section className='col-span-2'>
-            <Stories />
-            <Posts />
-        </section>
+    <main
+      className="grid grid-cols-1 md:grid-cols-2 md:max-w-3xl 
+    xl:grid-cols-3 xl:max-w-6xl mx-auto"
+    >
+      <section className="col-span-2">
+        <Stories />
+        <Posts />
+      </section>
 
-        <section className='hidden xl:inline-grid md:col-span-1'>
-            <div className='fixed top-20'>
-                <MiniProfile/>
-                <Suggestions />
-                
-            </div>
-        </section>
+      <section className="hidden xl:inline-grid md:col-span-1">
+        <div className="fixed top-20">
+          <MiniProfile />
+          <Suggestions />
+        </div>
+      </section>
     </main>
-  )
+  );
 }
 
-export default Feed
+export default Feed;
