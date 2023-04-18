@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {BsThreeDots, BsEmojiSmile} from 'react-icons/bs'
 import {BiComment} from 'react-icons/bi'
 import {AiFillHeart, AiOutlineHeart} from 'react-icons/ai'
@@ -21,6 +21,9 @@ import { db, storage } from "../firebase";
 import Moment from "react-moment";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
+import PostModal from '../components/PostModal';
+import { useDisclosure } from '@mantine/hooks';
+
 
 function Post({ id, username, userImg, img, caption, timeStamp, emojiPicker }) {
   const { data: session } = useSession();
@@ -29,6 +32,12 @@ function Post({ id, username, userImg, img, caption, timeStamp, emojiPicker }) {
   const [likes, setLikes] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
   const [showEmojis, setShowEmojis] = useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
+  const commentRef = useRef(null);
+
+  const handleComment = () => {
+    commentRef.current.focus();
+  };
 
   const ShowEmojis = () => {
     if (showEmojis == false) return setShowEmojis(true);
@@ -108,7 +117,16 @@ function Post({ id, username, userImg, img, caption, timeStamp, emojiPicker }) {
         <BsThreeDots className="h-5" />
       </div>
 
-      <img src={img} className="object-cover w-full" alt="" />
+      <img src={img} onClick={open} className="object-cover w-full cursor-pointer" alt="" />
+
+      <PostModal id={id}
+                    username={username}
+                    userImg={userImg}
+                    img={img}
+                    caption={caption}
+                    timeStamp={timeStamp}
+                    opened={opened}
+                    close={close}/>
 
       <div className="flex justify-between px-4 p-3">
         <div className="flex space-x-2">
@@ -120,7 +138,7 @@ function Post({ id, username, userImg, img, caption, timeStamp, emojiPicker }) {
           ) : (
             <AiOutlineHeart onClick={likePost} className="postBtn w-7" />
           )}
-          <BiComment className="postBtn w-7" />
+          <BiComment onClick={handleComment} className="postBtn w-7" />
           <GrSend className="postBtn w-7" />
           {likes.length > 0 &&
             (likes.length > 1 ? (
@@ -171,6 +189,7 @@ function Post({ id, username, userImg, img, caption, timeStamp, emojiPicker }) {
       <form className="flex items-center p-4">
         <BsEmojiSmile className="h-5 w-5" onClick={ShowEmojis} />
         <input
+        ref={commentRef}
           type="text"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
@@ -192,6 +211,7 @@ function Post({ id, username, userImg, img, caption, timeStamp, emojiPicker }) {
           <Picker data={data} onEmojiSelect={addEmoji} theme="light" />
         </div>
       )}
+
     </div>
   );
 }

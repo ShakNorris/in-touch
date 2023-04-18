@@ -13,7 +13,10 @@ export default async function handleSignUp(req, res){
 
         //check if user is a dupe
         const checkexisting = await Users.findOne({email});
-        if(checkexisting) return res.status(422).json({message: "This user already exists"});
+        if(checkexisting) 
+        {
+            return res.status(422).json({message: "This user already exists"});
+        }
 
         //TODO: Hash the password
         // CreateUser({firstname, lastname, username, email, password});

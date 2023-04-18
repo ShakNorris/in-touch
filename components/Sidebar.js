@@ -11,12 +11,18 @@ import {
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/dist/client/router";
 import { useRecoilState } from "recoil";
-import { modalState } from "../atoms/modalAtom";
+import { createModalState, searchModalState } from "../atoms/modalAtom";
+import OptionsModal from "../components/OptionsModal";
+import { useDisclosure } from '@mantine/hooks';
+import { Menu } from "@mantine/core";
 
 function Sidebar() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [open, setOpen] = useRecoilState(modalState);
+  const [openCreate, setOpenCreate] = useRecoilState(createModalState);
+  const [openSearch, setOpenSearch] = useRecoilState(searchModalState);
+  const [settingsOpened, { open, close }] = useDisclosure(false);
+
   //const open = useRecoilValue(modalState)
   console.log(session);
 
@@ -29,8 +35,16 @@ function Sidebar() {
         </div>
 
         <div className="flex flex-col">
-          <SidebarOption func={() => router.push('/')} Icon={IoHomeOutline} Title="Home" />
-          <SidebarOption Icon={HiMagnifyingGlass} Title="Search" />
+          <SidebarOption
+            func={() => router.push("/")}
+            Icon={IoHomeOutline}
+            Title="Home"
+          />
+          <SidebarOption
+            func={() => setOpenSearch(true)}
+            Icon={HiMagnifyingGlass}
+            Title="Search"
+          />
           <SidebarOption
             func={() => router.push("/chat")}
             Icon={AiOutlineMessage}
@@ -38,12 +52,15 @@ function Sidebar() {
           />
           <SidebarOption Icon={AiOutlineHeart} Title="Notifications" />
           <SidebarOption
-            func={() => setOpen(true)}
+            func={() => setOpenCreate(true)}
             Icon={AiOutlinePlusCircle}
             Title="Create"
           />
 
-          <div className="navBtn m-4 h-10" onClick={() => router.push(`/${session?.username}`)}>
+          <div
+            className="navBtn m-4 h-10"
+            onClick={() => router.push(`/${session.user.username}`)}
+          >
             <img
               src={session?.user?.image}
               alt="pfp"
@@ -53,8 +70,22 @@ function Sidebar() {
           </div>
         </div>
         <div className="fixed bottom-0">
-          <SidebarOption Icon={AiOutlineMenu} Title="Menu" />
+          <Menu shadow="md" width={200}>
+            {" "}
+            <Menu.Target>
+              <div className="navBtn m-4 mt-3 h-10 pt-1 items-center text-xl font-medium">
+                <AiOutlineMenu />
+                <h3>Menu</h3>
+              </div>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item onClick={open}>Settings</Menu.Item>
+              <Menu.Item>Log Out</Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
         </div>
+
+        <OptionsModal opened={settingsOpened} close={close} />
       </div>
     </div>
   );

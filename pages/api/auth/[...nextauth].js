@@ -3,7 +3,6 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import connectMongo from "../../../database/conn";
 import Users from "../../../model/Schema";
-import { useState } from "react";
 
 const bcrypt = require('bcryptjs');
 var provider = '';
@@ -77,17 +76,26 @@ export const authOptions = {
         .split(" ")
         .join("")
         .toLocaleLowerCase();
+        session.user.provider= 'google'
       }
 
       if(provider === 'credentials'){
         session.user.name = token.user.firstname + ' ' + token.user.lastname;
         session.user.username = token.user.username;
         session.user.image = `http://gravatar.com/avatar/?d=mp`;
+        session.user.provider = 'credentials'
+      }
+      else{
+        session.user.username = session.user.name
+        .split(" ")
+        .join("")
+        .toLocaleLowerCase();
+        session.user.provider = 'other';
       }
       
       session.user.uid = token.sub;
       session.user.accessToken = token.accessToken;
-      session.user.provider = provider;
+      
       return session;
     },
   },

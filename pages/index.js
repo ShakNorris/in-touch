@@ -4,9 +4,11 @@ import Header from '../components/Header'
 import Sidebar from '../components/Sidebar'
 import Feed from '../components/Feed'
 import UploadModal from '../components/UploadModal'
+import SearchModal from '../components/SearchModal'
 import { useSession, getSession } from 'next-auth/react';
-import {addDoc,setDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import {addDoc,setDoc, collection, doc, serverTimestamp, updateDoc, getDoc } from 'firebase/firestore';
 import {db, storage} from '../firebase';
+import PostModal from '../components/PostModal'
 
 export default function Home() {
 
@@ -21,6 +23,7 @@ export default function Home() {
       <Feed />
 
       <UploadModal />
+      <SearchModal />
     </div>
   )
 } 
@@ -29,20 +32,17 @@ export async function getServerSideProps(context) {
   const session = await getSession(context);
 
   if(session !== null){
-    // addDoc(collection(db, 'Users'), {
-    //     email: session.user.email,
-    //     profileImg: session.user.image,
-    //     name: session.user.name,
-    //     username: session.user.username,
-    //     joinDate: serverTimestamp(),
-    // })
-    // setDoc(doc(db, 'Users', session.user.uid), {
-    //   email: session?.user.email,
-    //   profileImg: session?.user.image,
-    //   name: session?.user.name,
-    //   username: session?.user.username,
-    //   provider: session?.user.provider,
-    // })
+    // const user = getDoc(db, 'Users', session.user.uid);
+    // if(!user){
+    //   setDoc(doc(db, 'Users', session.user.uid), {
+    //     email: session?.user.email,
+    //     profileImg: session?.user.image,
+    //     name: session?.user.name,
+    //     username: session?.user.username,
+    //     provider: session?.user.provider,
+    //     id: session?.user.uid,
+    //   })
+    // }
   }
 
   if (!session) {

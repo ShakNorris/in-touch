@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { useRecoilState } from "recoil";
-import { modalState } from "../atoms/modalAtom";
+import { createModalState } from "../atoms/modalAtom";
 import { BsCamera } from "react-icons/bs";
 import { db, storage } from "../firebase";
 import { useSession } from "next-auth/react";
@@ -16,7 +16,7 @@ import { Modal } from "@mantine/core";
 
 function UploadModal() {
   const { data: session } = useSession();
-  const [open, setOpen] = useRecoilState(modalState);
+  const [open, setOpen] = useRecoilState(createModalState);
   const chooseFileRef = useRef(null);
   const captionRef = useRef(null);
   const [loading, setLoading] = useState(false);

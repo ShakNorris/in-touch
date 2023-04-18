@@ -8,6 +8,6 @@ const userSchema = new Schema({
     password: String,
 })
 
-const Users = models.user || model('user', userSchema) // use already created model or create a new one
+const Users = models?.user || model('user', userSchema) // use already created model or create a new one
 
 export default Users;
