@@ -23,7 +23,6 @@ import {
   Avatar,
   Image,
 } from "@mantine/core";
-import { GoAlert } from "react-icons/go";
 
 export default function login({ providers }) {
   const [hasAccount, setHasAccount] = useState(false);

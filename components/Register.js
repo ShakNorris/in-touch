@@ -40,7 +40,7 @@ function Register() {
       });
 
     if (options) {
-      open;
+      open();
     }
   }
 
@@ -149,11 +149,11 @@ function Register() {
         {formik.values.password.length >= 1 && (
           <HoverCard width={280} shadow="md">
             <HoverCard.Target>
-              <p className="bold">Strength: {strength[testPassword.score]}</p>
+              <p className="bold cursor-pointer">Strength: {strength[testPassword.score]}</p>
             </HoverCard.Target>
             <HoverCard.Dropdown>
               <Text size="sm">{testPassword.feedback.suggestions}</Text>
-              {testPassword.score >= 2 && (
+              {testPassword.score > 2 && (
                 <Text size="sm">Your password is strong!</Text>
               )}
             </HoverCard.Dropdown>

@@ -7,8 +7,8 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import PostModal from "../components/PostModal";
 import { useDisclosure } from "@mantine/hooks";
-import UploadModal from '../components/UploadModal'
-import SearchModal from '../components/SearchModal'
+import UploadModal from "../components/UploadModal";
+import SearchModal from "../components/SearchModal";
 
 export default function User({ user }) {
   const [posts, setPosts] = useState();
@@ -27,7 +27,7 @@ export default function User({ user }) {
 
   function getPostData(p) {
     setClickedPost(p);
-    console.log(clickedPost)
+    console.log(clickedPost);
     open;
   }
 
@@ -42,7 +42,7 @@ export default function User({ user }) {
             </Head>
 
             <Sidebar />
-            <Header user={u} id={u.id} />
+            <Header user={u} postAmount={posts?.length} />
 
             <div className="p-10 flex flex-wrap">
               {posts?.map((p) => (
@@ -54,7 +54,9 @@ export default function User({ user }) {
                     onClick={open}
                   >
                     <Image
-                      onClick={() => {getPostData(p)}} 
+                      onClick={() => {
+                        getPostData(p);
+                      }}
                       src={p.value.image}
                       width={300}
                       height={300}
@@ -77,8 +79,8 @@ export default function User({ user }) {
           close={close}
         />
 
-      <UploadModal />
-      <SearchModal />
+        <UploadModal />
+        <SearchModal />
       </div>
     </>
   );
@@ -91,12 +93,6 @@ export async function getStaticProps({ params }) {
   return {
     props: { user },
   };
-
-  // const user = getAllUsers(id);
-
-  // return {
-  //     props: {user}
-  // }
 }
 
 export async function getStaticPaths() {

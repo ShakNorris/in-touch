@@ -14,3 +14,8 @@ export const postModalState = atom({
     key: 'postModalState',
     default: false,
 })
+
+export const followModalState = atom({
+    key: 'followModalState',
+    default: false,
+})

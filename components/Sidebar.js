@@ -15,6 +15,8 @@ import { createModalState, searchModalState } from "../atoms/modalAtom";
 import OptionsModal from "../components/OptionsModal";
 import { useDisclosure } from '@mantine/hooks';
 import { Menu } from "@mantine/core";
+import { signOut } from "next-auth/react";
+
 
 function Sidebar() {
   const { data: session } = useSession();
@@ -80,7 +82,7 @@ function Sidebar() {
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Item onClick={open}>Settings</Menu.Item>
-              <Menu.Item>Log Out</Menu.Item>
+              <Menu.Item onClick={() => signOut()}>Log Out</Menu.Item>
             </Menu.Dropdown>
           </Menu>
         </div>

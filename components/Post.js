@@ -187,7 +187,7 @@ function Post({ id, username, userImg, img, caption, timeStamp, emojiPicker }) {
       {/* )} */}
 
       <form className="flex items-center p-4">
-        <BsEmojiSmile className="h-5 w-5" onClick={ShowEmojis} />
+        <BsEmojiSmile className="h-5 w-5 cursor-pointer" onClick={ShowEmojis} />
         <input
         ref={commentRef}
           type="text"

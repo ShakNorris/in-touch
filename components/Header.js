@@ -18,17 +18,23 @@ import {
 import { db, storage } from "../firebase";
 import { BsCheck } from "react-icons/bs";
 import OptionsModal from "../components/OptionsModal";
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure } from "@mantine/hooks";
+import FollowModal from "../components/FollowModal";
+import { Modal, Group, Button } from '@mantine/core';
+import { followModalState } from "../atoms/modalAtom";
+import { useRecoilState } from "recoil";
 
-function Header({ user }) {
+function Header({ user, postAmount }) {
   const { data: session } = useSession();
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [hasFollowed, setHasFollowed] = useState(false);
   const [settingsOpened, { open, close }] = useDisclosure(false);
-
+  const [openFollow, setOpenFollow] = useRecoilState(followModalState);
+  const [check, setCheck] = useState(false);
+  
   const FollowUser = async () => {
-    if (hasFollowed)
+    if (hasFollowed) {
       return [
         await deleteDoc(
           doc(db, "Users", session.user.uid, "Following", user.id)
@@ -37,24 +43,26 @@ function Header({ user }) {
           doc(db, "Users", user.id, "Followers", session.user.uid)
         ),
       ];
-    return [
-      await setDoc(doc(db, "Users", session.user.uid, "Following", user.id), {
-        username: session.user.username,
-      }),
-      await setDoc(doc(db, "Users", user.id, "Followers", session.user.uid)),
-      {
-        username: session.user.username,
-      },
-    ];
+    } else {
+      return [
+        await setDoc(doc(db, "Users", session.user.uid, "Following", user.id), {
+          username: user.username,
+          id: user.id
+        }),
+        await setDoc(doc(db, "Users", user.id, "Followers", session.user.uid), {
+          username: session.user.username,
+          id: session.user.uid
+        }),
+      ];
+    }
   };
 
   useEffect(
     () =>
       setHasFollowed(
-        followers.findIndex((follows) => follows.id === session.user.uid) !==
-          -1 && following.findIndex((follows) => follows.id === user.uid) !== -1
+        followers.findIndex((follows) => follows.id === session.user.uid) !== -1
       ),
-    [followers, following]
+    [followers]
   );
 
   useEffect(
@@ -113,20 +121,20 @@ function Header({ user }) {
         </div>
 
         <div className="flex w-[300px] mt-3 justify-between">
-          <h4>10 Posts</h4>
+          <h4>{postAmount} Posts</h4>
           {followers.length >= 0 &&
             (followers.length > 1 ? (
-              <p className="pl-2 text-md cursor-pointer">
-                {" "}
+              <p onClick={() => {setOpenFollow(true); setCheck(true)}} className="pl-2 text-md cursor-pointer">
                 {likes.length} Followers
               </p>
             ) : (
-              <p className="pl-2 text-md cursor-pointer">
-                {" "}
+              <p onClick={() => {setOpenFollow(true); setCheck(true)}} className="pl-2 text-md cursor-pointer">
                 {followers.length} Follower
               </p>
             ))}
-          <h6>{following.length} Following</h6>
+          <h6 onClick={() => {setOpenFollow(true); setCheck(false)}} className="text-md cursor-pointer">
+            {following.length} Following
+          </h6>
         </div>
 
         <div className="w-[300px] mt-3">
@@ -141,6 +149,7 @@ function Header({ user }) {
       />
 
       <OptionsModal opened={settingsOpened} close={close} />
+      <FollowModal check={check} followers={followers} following={following}/>
     </div>
   );
 }
