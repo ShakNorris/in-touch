@@ -26,7 +26,6 @@ function Sidebar() {
   const [settingsOpened, { open, close }] = useDisclosure(false);
 
   //const open = useRecoilValue(modalState)
-  console.log(session);
 
   return (
     <div className="Sidebar">

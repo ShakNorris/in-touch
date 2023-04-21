@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import { createModalState } from "../atoms/modalAtom";
-import { BsCamera } from "react-icons/bs";
 import { db, storage } from "../firebase";
 import { useSession } from "next-auth/react";
 import {
@@ -13,6 +12,8 @@ import {
 } from "firebase/firestore";
 import { ref, getDownloadURL, uploadString } from "firebase/storage";
 import { Modal } from "@mantine/core";
+import {AiOutlineCloseCircle} from 'react-icons/ai'
+import {VscFileMedia} from 'react-icons/vsc'
 
 function UploadModal() {
   const { data: session } = useSession();
@@ -21,6 +22,19 @@ function UploadModal() {
   const captionRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [fileType, setFileType] = useState("");
+  const [isVideo, setIsVideo] = useState(false);
+
+  const acceptedFileType = [
+    "image/png",
+    "image/jpeg",
+    "image/jpg",
+    "image/gif",
+    "video/mp4",
+    "video/mov",
+    "video/avi",
+  ];
+  const acceptedVideoType = ["video/mp4", "video/mov", "video/avi"];
 
   const UploadPost = async () => {
     if (loading) return;
@@ -41,13 +55,14 @@ function UploadModal() {
 
     console.log("New doc added with ID", docRef.id);
 
-    const imageRef = ref(storage, `Posts/${docRef.id}/image`);
+    const imageRef = ref(storage, `Posts/${docRef.id}/file`);
 
     await uploadString(imageRef, selectedFile, "data_url").then(
       async (snapshot) => {
         const downloadURL = await getDownloadURL(imageRef);
         await updateDoc(doc(db, "Posts", docRef.id), {
           image: downloadURL,
+          type: fileType,
         });
       }
     );
@@ -58,9 +73,18 @@ function UploadModal() {
   };
 
   const addImageToPost = (e) => {
+    if (acceptedVideoType.includes(e.target.files[0].type)) {
+      setIsVideo(true);
+    }
+
     const reader = new FileReader();
-    if (e.target.files[0]) {
+
+    if (
+      e.target.files[0] &&
+      acceptedFileType.includes(e.target.files[0].type)
+    ) {
       reader.readAsDataURL(e.target.files[0]);
+      setFileType(e.target.files[0].type);
     }
 
     reader.onload = (readerEvent) => {
@@ -87,7 +111,6 @@ function UploadModal() {
   const fileDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log();
 
     const reader = new FileReader();
     if (e.dataTransfer.files[0]) {
@@ -115,20 +138,31 @@ function UploadModal() {
             onDragLeave={dragLeave}
             onDrop={fileDrop}
           >
-            <h2 className="font-bold text-lg text-center mb-3 mt-[-15px]">Create a new post</h2>
+            <h2 className="font-bold text-lg text-center mb-3 mt-[-15px]">
+              Create a new post
+            </h2>
             {selectedFile ? (
-              <img
-                src={selectedFile}
-                onClick={() => setSelectedFile(null)}
-                alt="upload"
-                className="w-full object-contain cursor-pointer"
-              />
+              isVideo ? (
+                <>
+                <AiOutlineCloseCircle className="w-6 h-6 cursor-pointer float-right" onClick={() => setSelectedFile(null)}/>
+                  <video width="750" height="500" controls>
+                    <source src={selectedFile} type={fileType} />
+                  </video>
+                </>
+              ) : (
+                <img
+                  src={selectedFile}
+                  onClick={() => setSelectedFile(null)}
+                  alt="upload"
+                  className="w-full object-contain cursor-pointer"
+                />
+              )
             ) : (
               <div
                 className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 cursor-pointer"
                 onClick={() => chooseFileRef.current.click()}
               >
-                <BsCamera
+                <VscFileMedia
                   className="h-6 w-6 text-blue-700"
                   aria-hidden="true"
                 />

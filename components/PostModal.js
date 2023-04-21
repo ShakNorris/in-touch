@@ -30,6 +30,7 @@ function PostModal({
   img,
   caption,
   timeStamp,
+  fileType
 }) {
   const { data: session } = useSession();
   const [comment, setComment] = useState("");
@@ -37,6 +38,8 @@ function PostModal({
   const [likes, setLikes] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
   const [showEmojis, setShowEmojis] = useState(false);
+  const videoTypes = ["video/mp4", "video/mov", "video/avi"];
+
 
   const commentRef = useRef(null);
 
@@ -116,7 +119,17 @@ function PostModal({
         withCloseButton={false}
       >
         <div class="grid grid-cols-2 gap-3">
-          <div> {<img src={img} className="w-max" />}</div>
+          <div>
+          {videoTypes.includes(fileType) ? (
+        <>
+          {" "}
+          <video className="h-[600px]" controls>
+            <source src={img} type={fileType} />
+          </video>
+        </>
+      ) : (
+        <img src={img} className="w-max" />
+      )} </div>
           <div className="relative">
             <div className="flex">
               <img

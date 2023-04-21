@@ -46,9 +46,10 @@ function Posts() {
           img={post.data().image}
           caption={post.data().caption}
           timeStamp={post.data().timestamp}
+          fileType={post.data().type}
         />
       ))}
-      {temp_data.map((post) => (
+      {/* {temp_data.map((post) => (
         <Post
           key={post.id}
           id={post.id}
@@ -57,7 +58,7 @@ function Posts() {
           img={post.img}
           caption={post.caption}
         />
-      ))}
+      ))} */}
 
     </div>
   );

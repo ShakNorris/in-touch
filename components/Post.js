@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import {BsThreeDots, BsEmojiSmile} from 'react-icons/bs'
-import {BiComment} from 'react-icons/bi'
-import {AiFillHeart, AiOutlineHeart} from 'react-icons/ai'
-import {GrSend} from 'react-icons/gr'
-import {FaRegBookmark} from 'react-icons/fa'
+import { BsEmojiSmile } from "react-icons/bs";
+import {IoOpenOutline} from 'react-icons/io5'
+import { BiComment } from "react-icons/bi";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { GrSend } from "react-icons/gr";
+import { FaRegBookmark } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import {
   addDoc,
@@ -21,11 +22,19 @@ import { db, storage } from "../firebase";
 import Moment from "react-moment";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
-import PostModal from '../components/PostModal';
-import { useDisclosure } from '@mantine/hooks';
+import PostModal from "../components/PostModal";
+import { useDisclosure } from "@mantine/hooks";
 
-
-function Post({ id, username, userImg, img, caption, timeStamp, emojiPicker }) {
+function Post({
+  id,
+  username,
+  userImg,
+  img,
+  caption,
+  timeStamp,
+  fileType,
+  emojiPicker,
+}) {
   const { data: session } = useSession();
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
@@ -34,6 +43,8 @@ function Post({ id, username, userImg, img, caption, timeStamp, emojiPicker }) {
   const [showEmojis, setShowEmojis] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const commentRef = useRef(null);
+
+  const videoTypes = ["video/mp4", "video/mov", "video/avi"];
 
   const handleComment = () => {
     commentRef.current.focus();
@@ -114,19 +125,36 @@ function Post({ id, username, userImg, img, caption, timeStamp, emojiPicker }) {
         <Moment className="pl-2 text-sm text-gray-400 flex-1" fromNow>
           {timeStamp?.toDate()}
         </Moment>
-        <BsThreeDots className="h-5" />
+        <IoOpenOutline className="h-5 w-5" onClick={open}/>
       </div>
 
-      <img src={img} onClick={open} className="object-cover w-full cursor-pointer" alt="" />
+      {videoTypes.includes(fileType) ? (
+        <>
+          {" "}
+          <video className="w-[800px]" controls>
+            <source src={img} type={fileType} />
+          </video>
+        </>
+      ) : (
+        <img
+          src={img}
+          onClick={open}
+          className="object-cover w-full cursor-pointer"
+          alt=""
+        />
+      )}
 
-      <PostModal id={id}
-                    username={username}
-                    userImg={userImg}
-                    img={img}
-                    caption={caption}
-                    timeStamp={timeStamp}
-                    opened={opened}
-                    close={close}/>
+      <PostModal
+        id={id}
+        username={username}
+        userImg={userImg}
+        img={img}
+        caption={caption}
+        timeStamp={timeStamp}
+        fileType={fileType}
+        opened={opened}
+        close={close}
+      />
 
       <div className="flex justify-between px-4 p-3">
         <div className="flex space-x-2">
@@ -189,7 +217,7 @@ function Post({ id, username, userImg, img, caption, timeStamp, emojiPicker }) {
       <form className="flex items-center p-4">
         <BsEmojiSmile className="h-5 w-5 cursor-pointer" onClick={ShowEmojis} />
         <input
-        ref={commentRef}
+          ref={commentRef}
           type="text"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
@@ -211,7 +239,6 @@ function Post({ id, username, userImg, img, caption, timeStamp, emojiPicker }) {
           <Picker data={data} onEmojiSelect={addEmoji} theme="light" />
         </div>
       )}
-
     </div>
   );
 }
