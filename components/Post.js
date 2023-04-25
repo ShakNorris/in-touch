@@ -1,29 +1,32 @@
 import React, { useState, useEffect, useRef } from "react";
-import { BsEmojiSmile } from "react-icons/bs";
-import {IoOpenOutline} from 'react-icons/io5'
+import { BsEmojiSmile, BsImage, BsThreeDots } from "react-icons/bs";
+import { IoOpenOutline } from "react-icons/io5";
 import { BiComment } from "react-icons/bi";
-import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { AiFillHeart, AiOutlineHeart, AiOutlineEdit } from "react-icons/ai";
 import { GrSend } from "react-icons/gr";
+import { RxVideo } from "react-icons/rx";
 import { FaRegBookmark } from "react-icons/fa";
 import { useSession } from "next-auth/react";
+import { RiDeleteBin6Line } from "react-icons/ri";
 import {
   addDoc,
   deleteDoc,
   getDocs,
   setDoc,
+  updateDoc,
   doc,
-  query,
   collection,
   onSnapshot,
-  orderBy,
   serverTimestamp,
 } from "firebase/firestore";
-import { db, storage } from "../firebase";
+import { db } from "../firebase";
 import Moment from "react-moment";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import PostModal from "../components/PostModal";
+import EditModal from "../components/EditModal";
 import { useDisclosure } from "@mantine/hooks";
+import { Menu } from "@mantine/core";
 
 function Post({
   id,
@@ -42,7 +45,14 @@ function Post({
   const [hasLiked, setHasLiked] = useState(false);
   const [showEmojis, setShowEmojis] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
+  const [openEdit, handlers] = useDisclosure(false);
+  const [decryptedFile, setDecryptedFile] = useState("");
+  const [newCaption, setNewCaption] = useState(caption);
+
   const commentRef = useRef(null);
+
+  var CryptoJS = require("crypto-js");
+  var key = "something";
 
   const videoTypes = ["video/mp4", "video/mov", "video/avi"];
 
@@ -96,6 +106,10 @@ function Post({
     });
   };
 
+  const DeletePost = async () => {
+    return await deleteDoc(doc(db, "Posts", id));
+  };
+
   useEffect(
     () =>
       setHasLiked(
@@ -112,6 +126,19 @@ function Post({
     setComment(comment + emoji);
   };
 
+  useEffect(() => {
+    const DecryptFile = async () => {
+      await fetch(img)
+        .then((r) => r.text())
+        .then((t) =>
+          setDecryptedFile(
+            CryptoJS.AES.decrypt(t, key).toString(CryptoJS.enc.Latin1)
+          )
+        );
+    };
+    DecryptFile();
+  }, []);
+
   return (
     <div className="relative bg-white my-5 border rounded-sm">
       <div className="flex items-center p-5">
@@ -122,22 +149,61 @@ function Post({
           alt=""
         />
         <p className="font-bold">{username}</p>
+        {videoTypes.includes(fileType) ? (
+          <>
+            <RxVideo className="h-8 w-8 pl-3" />
+          </>
+        ) : (
+          <BsImage className="h-8 w-8 pl-3" />
+        )}
         <Moment className="pl-2 text-sm text-gray-400 flex-1" fromNow>
           {timeStamp?.toDate()}
         </Moment>
-        <IoOpenOutline className="h-5 w-5" onClick={open}/>
+        {session ? (
+          <>
+            <div>
+              <Menu
+                shadow="md"
+                width={200}
+                transitionProps={{ transition: "pop", duration: 150 }}
+              >
+                <Menu.Target>
+                  <p>
+                    <BsThreeDots />
+                  </p>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Item onClick={DeletePost}>
+                    <p className="flex items-center">
+                      <RiDeleteBin6Line className="h-5 w-5 mr-1" /> Delete Post
+                    </p>
+                  </Menu.Item>
+                  <Menu.Item onClick={open}>
+                    <p className="flex items-center">
+                      <IoOpenOutline className="h-5 w-5 mr-1" /> Open Post
+                    </p>
+                  </Menu.Item>
+                  <Menu.Item onClick={() => handlers.open(true)}>
+                    <p className="flex items-center">
+                      <AiOutlineEdit className="h-5 w-5 mr-1" /> Edit Post
+                    </p>
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            </div>
+          </>
+        ) : (
+          <IoOpenOutline className="h-5 w-5" onClick={open} />
+        )}
       </div>
 
       {videoTypes.includes(fileType) ? (
         <>
-          {" "}
-          <video className="w-[800px]" controls>
-            <source src={img} type={fileType} />
-          </video>
+          <video src={decryptedFile} className="w-[800px]" controls />
         </>
       ) : (
         <img
-          src={img}
+          src={decryptedFile}
           onClick={open}
           className="object-cover w-full cursor-pointer"
           alt=""
@@ -156,6 +222,18 @@ function Post({
         close={close}
       />
 
+      <EditModal
+        id={id}
+        username={username}
+        userImg={userImg}
+        img={img}
+        caption={caption}
+        timeStamp={timeStamp}
+        fileType={fileType}
+        opened={openEdit}
+        close={() => handlers.close()}
+      />
+
       <div className="flex justify-between px-4 p-3">
         <div className="flex space-x-2">
           {hasLiked ? (
@@ -171,7 +249,6 @@ function Post({
           {likes.length > 0 &&
             (likes.length > 1 ? (
               <p className="pl-2 text-md text-gray-500">
-                {" "}
                 {likes.length} Likes
               </p>
             ) : (

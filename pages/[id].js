@@ -2,19 +2,16 @@ import { getAllUsersFirebase, getAllPostsFirebase } from "../lib/datahelper";
 import Head from "next/head";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import PostModal from "../components/PostModal";
-import { useDisclosure } from "@mantine/hooks";
 import UploadModal from "../components/UploadModal";
 import SearchModal from "../components/SearchModal";
+import ProfilePost from "../components/ProfilePost";
+import { db } from "../firebase";
 
 export default function User({ user }) {
   const [posts, setPosts] = useState();
-  const [opened, { open, close }] = useDisclosure(false);
   const { data: session } = useSession();
-  const [clickedPost, setClickedPost] = useState();
 
   async function fetchData() {
     const response = await getAllPostsFirebase(user);
@@ -23,13 +20,7 @@ export default function User({ user }) {
 
   useEffect(() => {
     fetchData();
-  }, [user]);
-
-  function getPostData(p) {
-    setClickedPost(p);
-    console.log(clickedPost);
-    open;
-  }
+  }, [db, posts]);
 
   return (
     <>
@@ -47,28 +38,14 @@ export default function User({ user }) {
             <div className="p-10 flex flex-wrap">
               {posts?.map((p) => (
                 <>
-                  <div
-                    key={p.id}
-                    id={p.id}
-                    className="navBtn mx-5 my-5 w-[300px] h-[300px] cursor-pointer"
-                    onClick={open}
-                  >
-                    <Image
-                      onClick={() => {
-                        getPostData(p);
-                      }}
-                      src={p.value.image}
-                      width={300}
-                      height={300}
-                      className="w-[300px] h-[300px] object-cover"
-                    />
-                  </div>
+                <ProfilePost post={p}/>
                 </>
               ))}
             </div>
           </>
         ))}
-        <PostModal
+
+        {/* <PostModal
           id={clickedPost?.id}
           username={clickedPost?.value.username}
           userImg={clickedPost?.value.profileImg}
@@ -77,7 +54,7 @@ export default function User({ user }) {
           timeStamp={clickedPost?.value.timestamp}
           opened={opened}
           close={close}
-        />
+        /> */}
 
         <UploadModal />
         <SearchModal />

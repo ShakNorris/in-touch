@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { Modal } from "@mantine/core";
+import { Modal, Menu } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import Moment from "react-moment";
-import { BsEmojiSmile } from "react-icons/bs";
+import { BsEmojiSmile, BsThreeDots } from "react-icons/bs";
 import { BiComment } from "react-icons/bi";
-import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { AiFillHeart, AiOutlineHeart, AiOutlineEdit } from "react-icons/ai";
+import { RiDeleteBin6Line } from "react-icons/ri";
 import {
   addDoc,
   deleteDoc,
@@ -20,6 +22,8 @@ import {
 import { db, storage } from "../firebase";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
+import EditModal from "../components/EditModal";
+
 
 function PostModal({
   opened,
@@ -30,7 +34,7 @@ function PostModal({
   img,
   caption,
   timeStamp,
-  fileType
+  fileType,
 }) {
   const { data: session } = useSession();
   const [comment, setComment] = useState("");
@@ -38,8 +42,13 @@ function PostModal({
   const [likes, setLikes] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
   const [showEmojis, setShowEmojis] = useState(false);
-  const videoTypes = ["video/mp4", "video/mov", "video/avi"];
+  const [decryptedFile, setDecryptedFile] = useState("");
+  const [openEdit, handlers] = useDisclosure(false);
 
+  var CryptoJS = require("crypto-js");
+  var key = "something";
+
+  const videoTypes = ["video/mp4", "video/mov", "video/avi"];
 
   const commentRef = useRef(null);
 
@@ -93,6 +102,10 @@ function PostModal({
     });
   };
 
+  const DeletePost = async () => {
+    return await deleteDoc(doc(db, "Posts", id));
+  };
+
   useEffect(
     () =>
       setHasLiked(
@@ -109,6 +122,19 @@ function PostModal({
     setComment(comment + emoji);
   };
 
+  useEffect(() => {
+    const DecryptFile = async () => {
+      await fetch(img)
+        .then((r) => r.text())
+        .then((t) =>
+          setDecryptedFile(
+            CryptoJS.AES.decrypt(t, key).toString(CryptoJS.enc.Latin1)
+          )
+        );
+    };
+    DecryptFile();
+  }, []);
+
   return (
     <>
       <Modal
@@ -120,16 +146,16 @@ function PostModal({
       >
         <div class="grid grid-cols-2 gap-3">
           <div>
-          {videoTypes.includes(fileType) ? (
-        <>
-          {" "}
-          <video className="h-[600px]" controls>
-            <source src={img} type={fileType} />
-          </video>
-        </>
-      ) : (
-        <img src={img} className="w-max" />
-      )} </div>
+            {videoTypes.includes(fileType) ? (
+              <>
+                <video className="w-max" controls>
+                  <source src={decryptedFile} type={fileType} />
+                </video>
+              </>
+            ) : (
+              <img src={decryptedFile} className="w-max" />
+            )}{" "}
+          </div>
           <div className="relative">
             <div className="flex">
               <img
@@ -142,11 +168,55 @@ function PostModal({
               <Moment className="pl-2 text-sm text-gray-400 flex-1" fromNow>
                 {timeStamp?.toDate()}
               </Moment>
+              {session ? (
+                <>
+                  <div>
+                    <Menu
+                      shadow="md"
+                      width={200}
+                      transitionProps={{ transition: "pop", duration: 150 }}
+                    >
+                      <Menu.Target>
+                        <p>
+                          <BsThreeDots />
+                        </p>
+                      </Menu.Target>
+                      <Menu.Dropdown>
+                        <Menu.Item onClick={DeletePost}>
+                          <p className="flex items-center">
+                            <RiDeleteBin6Line className="h-5 w-5 mr-1" /> Delete
+                            Post
+                          </p>
+                        </Menu.Item>
+                        <Menu.Item onClick={() => handlers.open(true)}>
+                          <p className="flex items-center">
+                            <AiOutlineEdit className="h-5 w-5 mr-1" /> Edit Post
+                          </p>
+                        </Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
+                  </div>
+                </>
+              ) : (
+                <></>
+              )}
             </div>
             <div>
               <p className="p-1 pb-2 border-b bg-white font-semibold">
                 {caption}
               </p>
+
+              <EditModal
+                id={id}
+                username={username}
+                userImg={userImg}
+                img={img}
+                caption={caption}
+                timeStamp={timeStamp}
+                fileType={fileType}
+                opened={openEdit}
+                close={() => handlers.close()}
+              />
 
               <div>
                 {comments.length > 0 && (
@@ -188,7 +258,10 @@ function PostModal({
                           className="postBtn w-7"
                         />
                       )}
-                      <BiComment onClick={handleComment} className="postBtn w-7" />
+                      <BiComment
+                        onClick={handleComment}
+                        className="postBtn w-7"
+                      />
                       {likes.length > 0 &&
                         (likes.length > 1 ? (
                           <p className="pl-2 text-md text-gray-500">
@@ -207,7 +280,7 @@ function PostModal({
                   <form className="flex items-center w-full">
                     <BsEmojiSmile className="h-5 w-5" onClick={ShowEmojis} />
                     <input
-                    ref={commentRef}
+                      ref={commentRef}
                       type="text"
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}

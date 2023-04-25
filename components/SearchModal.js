@@ -4,13 +4,7 @@ import { searchModalState } from "../atoms/modalAtom";
 import { BsCamera } from "react-icons/bs";
 import { db, storage } from "../firebase";
 import { useSession } from "next-auth/react";
-import {
-  addDoc,
-  doc,
-  serverTimestamp,
-  updateDoc,
-  getDocs,
-} from "firebase/firestore";
+import { getDocs } from "firebase/firestore";
 import { AiOutlineSearch } from "react-icons/ai";
 import { Modal, Input } from "@mantine/core";
 import { collection, query, where } from "firebase/firestore";
@@ -51,23 +45,37 @@ function SearchModal() {
             onChange={(e) => setSearch(e.target.value)}
           />
 
-          <div>
-            {users
-              .filter((u) => {
-                return (
-                  u.username.toLowerCase().indexOf(search.toLowerCase()) > -1
-                );
-              })
-              .map((u) => (
-                <div onClick={() => {router.push(`/${u.username}`); setOpen(false)}} key={u.id} className="flex justify-between mt-3 cursor-pointer hover:bg-gray-100">
-                  <img className="ml-2 w-10 h-10 rounded-full" src={u.profileImg} />
-                  <div className="flex-1 ml-4">
-                    <h2 className="font-semibold text-sm">{u.username}</h2>
-                    <h3 className="text-xs text-gray-400">{u.email}</h3>
+          {search ? (
+            <div>
+              {users
+                .filter((u) => {
+                  return (
+                    u.username.toLowerCase().indexOf(search.toLowerCase()) > -1
+                  );
+                })
+                .map((u) => (
+                  <div
+                    onClick={() => {
+                      router.push(`/${u.username}`);
+                      setOpen(false);
+                    }}
+                    key={u.id}
+                    className="flex justify-between mt-3 cursor-pointer hover:bg-gray-100"
+                  >
+                    <img
+                      className="ml-2 w-10 h-10 rounded-full"
+                      src={u.profileImg}
+                    />
+                    <div className="flex-1 ml-4">
+                      <h2 className="font-semibold text-sm">{u.username}</h2>
+                      <h3 className="text-xs text-gray-400">{u.email}</h3>
+                    </div>
                   </div>
-                </div>
-              ))}
-          </div>
+                ))}
+            </div>
+          ) : (
+            <></>
+          )}
         </div>
       </Modal>
     </>

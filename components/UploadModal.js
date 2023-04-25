@@ -12,8 +12,8 @@ import {
 } from "firebase/firestore";
 import { ref, getDownloadURL, uploadString } from "firebase/storage";
 import { Modal } from "@mantine/core";
-import {AiOutlineCloseCircle} from 'react-icons/ai'
-import {VscFileMedia} from 'react-icons/vsc'
+import { AiOutlineCloseCircle } from "react-icons/ai";
+import { VscFileMedia } from "react-icons/vsc";
 
 function UploadModal() {
   const { data: session } = useSession();
@@ -24,6 +24,11 @@ function UploadModal() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileType, setFileType] = useState("");
   const [isVideo, setIsVideo] = useState(false);
+  const [encrypt, setEncrypt] = useState("");
+  const [decrypt, setDecrypt] = useState("")
+
+  var CryptoJS = require("crypto-js");
+  var key = "something";
 
   const acceptedFileType = [
     "image/png",
@@ -33,8 +38,16 @@ function UploadModal() {
     "video/mp4",
     "video/mov",
     "video/avi",
+    "video/quicktime",
+    "video/ogg",
   ];
-  const acceptedVideoType = ["video/mp4", "video/mov", "video/avi"];
+  const acceptedVideoType = [
+    "video/mp4",
+    "video/mov",
+    "video/avi",
+    "video/quicktime",
+    "video/ogg",
+  ];
 
   const UploadPost = async () => {
     if (loading) return;
@@ -57,38 +70,42 @@ function UploadModal() {
 
     const imageRef = ref(storage, `Posts/${docRef.id}/file`);
 
-    await uploadString(imageRef, selectedFile, "data_url").then(
-      async (snapshot) => {
-        const downloadURL = await getDownloadURL(imageRef);
-        await updateDoc(doc(db, "Posts", docRef.id), {
-          image: downloadURL,
-          type: fileType,
-        });
-      }
-    );
+    await uploadString(imageRef, encrypt).then(async (snapshot) => {
+      const downloadURL = await getDownloadURL(imageRef);
+
+      await updateDoc(doc(db, "Posts", docRef.id), {
+        image: downloadURL,
+        type: fileType,
+      });
+    });
 
     setOpen(false);
     setLoading(false);
     setSelectedFile(null);
+    setIsVideo(false);
   };
 
-  const addImageToPost = (e) => {
-    if (acceptedVideoType.includes(e.target.files[0].type)) {
+  const addFileToPost = (e) => {
+    if (e.files[0].size / 1000 ** 2 > 25) {
+      return alert("Your chosen file is too large :(");
+    }
+
+    if (acceptedVideoType.includes(e.files[0].type)) {
       setIsVideo(true);
+    } else {
+      setIsVideo(false);
     }
 
     const reader = new FileReader();
 
-    if (
-      e.target.files[0] &&
-      acceptedFileType.includes(e.target.files[0].type)
-    ) {
-      reader.readAsDataURL(e.target.files[0]);
-      setFileType(e.target.files[0].type);
+    if (e.files[0] && acceptedFileType.includes(e.files[0].type)) {
+      reader.readAsDataURL(e.files[0]);
+      setFileType(e.files[0].type);
     }
 
     reader.onload = (readerEvent) => {
       setSelectedFile(readerEvent.target.result);
+      setEncrypt(String(CryptoJS.AES.encrypt(readerEvent.target.result, key)));
     };
   };
 
@@ -111,15 +128,7 @@ function UploadModal() {
   const fileDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
-
-    const reader = new FileReader();
-    if (e.dataTransfer.files[0]) {
-      reader.readAsDataURL(e.dataTransfer.files[0]);
-    }
-
-    reader.onload = (readerEvent) => {
-      setSelectedFile(readerEvent.target.result);
-    };
+    addFileToPost(e.dataTransfer);
   };
 
   return (
@@ -144,7 +153,10 @@ function UploadModal() {
             {selectedFile ? (
               isVideo ? (
                 <>
-                <AiOutlineCloseCircle className="w-6 h-6 cursor-pointer float-right" onClick={() => setSelectedFile(null)}/>
+                  <AiOutlineCloseCircle
+                    className="w-6 h-6 cursor-pointer float-right"
+                    onClick={() => setSelectedFile(null)}
+                  />
                   <video width="750" height="500" controls>
                     <source src={selectedFile} type={fileType} />
                   </video>
@@ -176,7 +188,7 @@ function UploadModal() {
                     ref={chooseFileRef}
                     type="file"
                     hidden
-                    onChange={addImageToPost}
+                    onChange={(e) => addFileToPost(e.target)}
                   ></input>
                 </div>
 

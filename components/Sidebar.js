@@ -71,7 +71,7 @@ function Sidebar() {
           </div>
         </div>
         <div className="fixed bottom-0">
-          <Menu shadow="md" width={200}>
+          <Menu shadow="md" width={200} transitionProps={{ transition: 'pop', duration: 150 }}>
             {" "}
             <Menu.Target>
               <div className="navBtn m-4 mt-3 h-10 pt-1 items-center text-xl font-medium">
