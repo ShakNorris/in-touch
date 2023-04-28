@@ -6,21 +6,21 @@ import {
   AiOutlineMessage,
   AiOutlineHeart,
   AiOutlinePlusCircle,
-  AiOutlineMenu,
 } from "react-icons/ai";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/dist/client/router";
 import { useRecoilState } from "recoil";
 import { createModalState, searchModalState } from "../atoms/modalAtom";
 import OptionsModal from "../components/OptionsModal";
-import { useDisclosure } from '@mantine/hooks';
-import { Menu } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { Menu, Burger } from "@mantine/core";
 import { signOut } from "next-auth/react";
-
 
 function Sidebar() {
   const { data: session } = useSession();
   const router = useRouter();
+  const [opened, { toggle }] = useDisclosure(false);
+  const label = opened ? "Close" : "Open";
   const [openCreate, setOpenCreate] = useRecoilState(createModalState);
   const [openSearch, setOpenSearch] = useRecoilState(searchModalState);
   const [settingsOpened, { open, close }] = useDisclosure(false);
@@ -71,11 +71,22 @@ function Sidebar() {
           </div>
         </div>
         <div className="fixed bottom-0">
-          <Menu shadow="md" width={200} transitionProps={{ transition: 'pop', duration: 150 }}>
-            {" "}
+          <Menu
+            shadow="md"
+            width={200}
+            transitionProps={{ transition: "pop", duration: 150 }}
+          >
             <Menu.Target>
-              <div className="navBtn m-4 mt-3 h-10 pt-1 items-center text-xl font-medium">
-                <AiOutlineMenu />
+              {/* <div className="navBtn m-4 mt-3 h-10 pt-1 items-center text-xl font-medium"> */}
+              <div
+                onClick={toggle}
+                className="navBtn m-4 mt-3 h-10 pt-1 items-center text-xl font-medium"
+              >
+                <Burger
+                  opened={opened}
+                  aria-label={label}
+                  label="Menu"
+                />
                 <h3>Menu</h3>
               </div>
             </Menu.Target>

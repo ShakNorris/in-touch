@@ -24,7 +24,6 @@ import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
 import EditModal from "../components/EditModal";
 
-
 function PostModal({
   opened,
   close,
@@ -46,7 +45,6 @@ function PostModal({
   const [openEdit, handlers] = useDisclosure(false);
 
   var CryptoJS = require("crypto-js");
-  var key = "something";
 
   const videoTypes = ["video/mp4", "video/mov", "video/avi"];
 
@@ -65,7 +63,7 @@ function PostModal({
     };
 
     getComments();
-  }, [db, id]);
+  }, [db, comments]);
 
   const ShowEmojis = () => {
     if (showEmojis == false) return setShowEmojis(true);
@@ -75,11 +73,14 @@ function PostModal({
   const SendComment = async (e) => {
     e.preventDefault();
 
-    const commentToSend = comment;
+    const commentToSend = CryptoJS.TripleDES.encrypt(
+      comment,
+      process.env.NEXT_PUBLIC_DES_KEY
+    );
     setComment("");
 
     await addDoc(collection(db, "Posts", id, "Comments"), {
-      comment: commentToSend,
+      comment: commentToSend.toString(),
       username: session.user.username,
       profileImg: session.user.image,
       timestamp: serverTimestamp(),
@@ -128,7 +129,10 @@ function PostModal({
         .then((r) => r.text())
         .then((t) =>
           setDecryptedFile(
-            CryptoJS.AES.decrypt(t, key).toString(CryptoJS.enc.Latin1)
+            CryptoJS.AES.decrypt(
+              t,
+              process.env.NEXT_PUBLIC_CRYPTO_KEY
+            ).toString(CryptoJS.enc.Latin1)
           )
         );
     };
@@ -144,8 +148,8 @@ function PostModal({
         centered
         withCloseButton={false}
       >
-        <div class="grid grid-cols-2 gap-3">
-          <div>
+        <div class="grid grid-cols-3 gap-3">
+          <div className="col-span-2">
             {videoTypes.includes(fileType) ? (
               <>
                 <video className="w-max" controls>
@@ -234,7 +238,10 @@ function PostModal({
                           <span className="font-semibold mr-1">
                             {comment.data().username}
                           </span>
-                          {comment.data().comment}
+                          {CryptoJS.TripleDES.decrypt(
+                            comment.data().comment,
+                            process.env.NEXT_PUBLIC_DES_KEY
+                          ).toString(CryptoJS.enc.Latin1)}
                         </p>
                         <Moment className="pr-5 text-xs text-gray-400" fromNow>
                           {comment.data().timestamp?.toDate()}

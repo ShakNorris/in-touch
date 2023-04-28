@@ -28,7 +28,8 @@ function UploadModal() {
   const [decrypt, setDecrypt] = useState("")
 
   var CryptoJS = require("crypto-js");
-  var key = "something";
+
+  console.log(process.env.NEXT_PUBLIC_CRYPTO_KEY)
 
   const acceptedFileType = [
     "image/png",
@@ -105,7 +106,7 @@ function UploadModal() {
 
     reader.onload = (readerEvent) => {
       setSelectedFile(readerEvent.target.result);
-      setEncrypt(String(CryptoJS.AES.encrypt(readerEvent.target.result, key)));
+      setEncrypt(String(CryptoJS.AES.encrypt(readerEvent.target.result, process.env.NEXT_PUBLIC_CRYPTO_KEY)));
     };
   };
 

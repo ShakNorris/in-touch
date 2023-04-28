@@ -14,7 +14,7 @@ function ProfilePost({post}) {
         .then((r) => r.text())
         .then((t) =>
           setDecryptedFile(
-            CryptoJS.AES.decrypt(t, key).toString(CryptoJS.enc.Latin1)
+            CryptoJS.AES.decrypt(t, process.env.NEXT_PUBLIC_CRYPTO_KEY).toString(CryptoJS.enc.Latin1)
           )
         );
     };
@@ -32,9 +32,6 @@ function ProfilePost({post}) {
   const [opened, { open, close }] = useDisclosure(false);
 
   var CryptoJS = require("crypto-js");
-  var key = "something";
-
-  console.log(post)
 
   return (
     <>

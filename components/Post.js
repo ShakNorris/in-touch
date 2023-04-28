@@ -28,16 +28,7 @@ import EditModal from "../components/EditModal";
 import { useDisclosure } from "@mantine/hooks";
 import { Menu } from "@mantine/core";
 
-function Post({
-  id,
-  username,
-  userImg,
-  img,
-  caption,
-  timeStamp,
-  fileType,
-  emojiPicker,
-}) {
+function Post({ id, username, userImg, img, caption, timeStamp, fileType }) {
   const { data: session } = useSession();
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
@@ -47,14 +38,18 @@ function Post({
   const [opened, { open, close }] = useDisclosure(false);
   const [openEdit, handlers] = useDisclosure(false);
   const [decryptedFile, setDecryptedFile] = useState("");
-  const [newCaption, setNewCaption] = useState(caption);
 
   const commentRef = useRef(null);
 
   var CryptoJS = require("crypto-js");
-  var key = "something";
 
   const videoTypes = ["video/mp4", "video/mov", "video/avi"];
+
+  const testEncrypt = CryptoJS.TripleDES.encrypt(
+    "YO WASSUP",
+    process.env.NEXT_PUBLIC_DES_KEY
+  );
+  // console.log(testEncrypt)
 
   const handleComment = () => {
     commentRef.current.focus();
@@ -70,11 +65,14 @@ function Post({
   const SendComment = async (e) => {
     e.preventDefault();
 
-    const commentToSend = comment;
+    const commentToSend = CryptoJS.TripleDES.encrypt(
+      comment,
+      process.env.NEXT_PUBLIC_DES_KEY
+    );
     setComment("");
 
     await addDoc(collection(db, "Posts", id, "Comments"), {
-      comment: commentToSend,
+      comment: commentToSend.toString(),
       username: session.user.username,
       profileImg: session.user.image,
       timestamp: serverTimestamp(),
@@ -88,7 +86,7 @@ function Post({
     };
 
     getComments();
-  }, [db]);
+  }, [db, comments]);
 
   useEffect(
     () =>
@@ -132,7 +130,10 @@ function Post({
         .then((r) => r.text())
         .then((t) =>
           setDecryptedFile(
-            CryptoJS.AES.decrypt(t, key).toString(CryptoJS.enc.Latin1)
+            CryptoJS.AES.decrypt(
+              t,
+              process.env.NEXT_PUBLIC_CRYPTO_KEY
+            ).toString(CryptoJS.enc.Latin1)
           )
         );
     };
@@ -248,9 +249,7 @@ function Post({
           <GrSend className="postBtn w-7" />
           {likes.length > 0 &&
             (likes.length > 1 ? (
-              <p className="pl-2 text-md text-gray-500">
-                {likes.length} Likes
-              </p>
+              <p className="pl-2 text-md text-gray-500">{likes.length} Likes</p>
             ) : (
               <p className="pl-2 text-md text-gray-500"> {likes.length} Like</p>
             ))}
@@ -279,7 +278,10 @@ function Post({
                   <span className="font-bold mr-1">
                     {comment.data().username}
                   </span>
-                  {comment.data().comment}
+                  {CryptoJS.TripleDES.decrypt(
+                    comment.data().comment,
+                    process.env.NEXT_PUBLIC_DES_KEY
+                  ).toString(CryptoJS.enc.Latin1)}
                 </p>
                 <Moment className="pr-5 text-xs text-gray-400" fromNow>
                   {comment.data().timestamp?.toDate()}
