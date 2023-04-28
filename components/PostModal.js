@@ -54,16 +54,17 @@ function PostModal({
     commentRef.current.focus();
   };
 
-  useEffect(() => {
-    const getComments = async () => {
-      if (id) {
-        const data = await getDocs(collection(db, "Posts", id, "Comments"));
-        setComments(data.docs);
-      }
-    };
-
-    getComments();
-  }, [db, comments]);
+  useEffect(
+    () =>
+      onSnapshot(
+        query(
+          collection(db, "Posts", id, "Comments"),
+          orderBy("timestamp", "desc")
+        ),
+        (snapshot) => setComments(snapshot.docs)
+      ),
+    [db]
+  );
 
   const ShowEmojis = () => {
     if (showEmojis == false) return setShowEmojis(true);

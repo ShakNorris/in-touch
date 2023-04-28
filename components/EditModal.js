@@ -17,8 +17,6 @@ function EditModal({
   const [newCaption, setNewCaption] = useState(caption);
   const theme = useMantineTheme();
 
-  console.log({ id, caption });
-
   const Edit = async () => {
     return await updateDoc(doc(db, "Posts", id), {
       caption: newCaption,

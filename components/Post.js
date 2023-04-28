@@ -18,6 +18,8 @@ import {
   collection,
   onSnapshot,
   serverTimestamp,
+  query,
+  orderBy,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import Moment from "react-moment";
@@ -54,8 +56,6 @@ function Post({ id, username, userImg, img, caption, timeStamp, fileType }) {
     return setShowEmojis(false);
   };
 
-  const commentCollectionRef = collection(db, "Posts", id, "Comments");
-
   const SendComment = async (e) => {
     e.preventDefault();
 
@@ -73,14 +73,24 @@ function Post({ id, username, userImg, img, caption, timeStamp, fileType }) {
     });
   };
 
-  useEffect(() => {
-    const getComments = async () => {
-      const data = await getDocs(commentCollectionRef);
-      setComments(data.docs);
-    };
+  useEffect(
+    () =>
+      onSnapshot(
+        query(
+          collection(db, "Posts", id, "Comments"),
+          orderBy("timestamp", "desc")
+        ),
+        (snapshot) => setComments(snapshot.docs)
+      ),
+    [db]
 
-    getComments();
-  }, [db, comments]);
+    //   const getComments = async () => {
+    //     const data = await getDocs(commentCollectionRef);
+    //     setComments(data.docs);
+    //   };
+
+    //   getComments();
+  );
 
   useEffect(
     () =>
@@ -132,7 +142,7 @@ function Post({ id, username, userImg, img, caption, timeStamp, fileType }) {
         );
     };
     DecryptFile();
-  }, [decryptedFile]); //test this
+  }, [decryptedFile]); //test
 
   return (
     <div className="relative bg-white my-5 border rounded-sm">
