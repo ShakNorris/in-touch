@@ -45,12 +45,6 @@ function Post({ id, username, userImg, img, caption, timeStamp, fileType }) {
 
   const videoTypes = ["video/mp4", "video/mov", "video/avi"];
 
-  const testEncrypt = CryptoJS.TripleDES.encrypt(
-    "YO WASSUP",
-    process.env.NEXT_PUBLIC_DES_KEY
-  );
-  // console.log(testEncrypt)
-
   const handleComment = () => {
     commentRef.current.focus();
   };
@@ -138,7 +132,7 @@ function Post({ id, username, userImg, img, caption, timeStamp, fileType }) {
         );
     };
     DecryptFile();
-  }, []);
+  }, [decryptedFile]); //test this
 
   return (
     <div className="relative bg-white my-5 border rounded-sm">

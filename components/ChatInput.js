@@ -22,6 +22,7 @@ function ChatInput({ chat, sessionUser }) {
     sessionUser.uid > chat.id
       ? `${sessionUser.uid + chat.id}`
       : `${chat.id + sessionUser.uid}`;
+  var CryptoJS = require("crypto-js");
 
   const acceptedFileType = [
     "image/png",
@@ -34,6 +35,7 @@ function ChatInput({ chat, sessionUser }) {
     "video/quicktime",
     "video/ogg",
   ];
+
   const acceptedVideoType = [
     "video/mp4",
     "video/mov",
@@ -61,9 +63,14 @@ function ChatInput({ chat, sessionUser }) {
     try {
       const res = await getDoc(doc(db, "Chats", combinedId));
 
+      const encryptedMessage = CryptoJS.TripleDES.encrypt(
+        message,
+        process.env.NEXT_PUBLIC_DES_KEY
+      );
+
       if (!res.exists()) {
         await addDoc(collection(db, "Messages", combinedId, "Chat"), {
-          message: message,
+          message: encryptedMessage.toString(),
           user: sessionUser,
           timestamp: serverTimestamp(),
           type: "message",
@@ -88,8 +95,7 @@ function ChatInput({ chat, sessionUser }) {
       }
 
       reader.onload = (readerEvent) => {
-        // setFile(readerEvent.target.result);
-        sendFile(readerEvent.target.result, e.files[0].type);
+        sendFile(String(CryptoJS.AES.encrypt(readerEvent.target.result, process.env.NEXT_PUBLIC_CRYPTO_KEY)), e.files[0].type);
       };
     }
   };
@@ -106,7 +112,8 @@ function ChatInput({ chat, sessionUser }) {
 
     const imageRef = ref(storage, `Chats/${docRef.id}/file`);
 
-    await uploadString(imageRef, file, "data_url").then(async (snapshot) => {
+    // await uploadString(imageRef, file, "data_url").then(async (snapshot) => {
+    await uploadString(imageRef, file).then(async (snapshot) => {
       const downloadURL = await getDownloadURL(imageRef);
 
       await updateDoc(doc(db, "Messages", combinedId, "Chat", docRef.id), {

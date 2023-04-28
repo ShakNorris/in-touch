@@ -29,8 +29,6 @@ function UploadModal() {
 
   var CryptoJS = require("crypto-js");
 
-  console.log(process.env.NEXT_PUBLIC_CRYPTO_KEY)
-
   const acceptedFileType = [
     "image/png",
     "image/jpeg",

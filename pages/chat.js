@@ -4,7 +4,13 @@ import Sidebar from "../components/Sidebar";
 import UploadModal from "../components/UploadModal";
 import SearchModal from "../components/SearchModal";
 import { useSession, getSession } from "next-auth/react";
-import { collection, onSnapshot, orderBy, query, where } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "../firebase";
 import { GrSend } from "react-icons/gr";
 import {
@@ -19,7 +25,7 @@ import ChatInput from "../components/ChatInput";
 function chat() {
   const [users, setUsers] = useState([]);
   const [chat, setChat] = useState("");
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState([]);
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -39,10 +45,16 @@ function chat() {
   }, []);
 
   const selectChat = (user) => {
-    setChat(user)
+    setChat(user);
 
-    const combinedId = session.user.uid > user.id ? `${session.user.uid + user.id}` : `${user.id + session.user.uid}`
-    const messageQuery = query(collection(db, 'Messages', combinedId, 'Chat'), orderBy('timestamp', 'asc'))
+    const combinedId =
+      session.user.uid > user.id
+        ? `${session.user.uid + user.id}`
+        : `${user.id + session.user.uid}`;
+    const messageQuery = query(
+      collection(db, "Messages", combinedId, "Chat"),
+      orderBy("timestamp", "asc")
+    );
     onSnapshot(messageQuery, (snap) => {
       let messages = [];
       snap.forEach((doc) => {
@@ -50,9 +62,7 @@ function chat() {
       });
       setMessages(messages);
     });
-  }
-
-  console.log(messages)
+  };
 
   return (
     <div className="">
@@ -100,14 +110,30 @@ function chat() {
                   </div>
 
                   <div className="flex items-center">
-                    <IoCallOutline className="w-5 h-5 cursor-pointer" />
-                    <IoVideocamOutline className="w-5 h-5 cursor-pointer" />
+                    <IoCallOutline className="w-5 h-5 cursor-pointer mr-2" />
+                    <IoVideocamOutline className="w-5 h-5 cursor-pointer mr-2" />
                     <IoInformationCircleOutline className="w-5 h-5 cursor-pointer" />
                   </div>
                 </div>
 
-                <ChatContent messages={messages} className="h-fit"/>
-                <ChatInput className="fixed bottom-0" chat={chat} sessionUser={session.user}/>
+                <div className="h-[540px] w-full overflow-y-auto scrollbar-thin scrollbar-thumb-white scrollbar-hide">
+                  {messages.map((message) => (
+                    <ChatContent
+                      message={message.message}
+                      user={message.user}
+                      file={message.file}
+                      type={message.type}
+                      timestamp={message.timestamp}
+                      className="h-fit"
+                    />
+                  ))}
+                </div>
+
+                <ChatInput
+                  className="fixed bottom-0"
+                  chat={chat}
+                  sessionUser={session.user}
+                />
               </>
             ) : (
               <>
