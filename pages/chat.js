@@ -17,17 +17,21 @@ import {
   IoCallOutline,
   IoVideocamOutline,
   IoInformationCircleOutline,
+  IoSearch,
 } from "react-icons/io5";
 import { useRouter } from "next/router";
 import ChatContent from "../components/ChatContent";
 import ChatInput from "../components/ChatInput";
+import { Popover, Input } from "@mantine/core";
 
 function chat() {
   const [users, setUsers] = useState([]);
   const [chat, setChat] = useState("");
   const [messages, setMessages] = useState([]);
+  const [searchState, setSearchState] = useState("");
   const { data: session } = useSession();
   const router = useRouter();
+  const [opened, setOpened] = useState(false);
 
   useEffect(() => {
     collection(db, "Users");
@@ -109,14 +113,30 @@ function chat() {
                     </h2>
                   </div>
 
-                  <div className="flex items-center">
+                  <div className="relative flex items-center">
+                    <Popover opened={opened} onChange={setOpened} position="bottom" withArrow shadow="md" >
+                      <Popover.Target>
+                        <IoSearch
+                          onClick={() => setOpened((o) => !o)}
+                          className="w-5 h-5 cursor-pointer mr-2"
+                        />
+                      </Popover.Target>
+
+                      <Popover.Dropdown className="mt-8">
+                        <Input
+                          placeholder="Search"
+                          size="md"
+                          onChange={(e) => setSearchState(e.target.value)}
+                        />
+                      </Popover.Dropdown>
+                    </Popover>
                     <IoCallOutline className="w-5 h-5 cursor-pointer mr-2" />
                     <IoVideocamOutline className="w-5 h-5 cursor-pointer mr-2" />
                     <IoInformationCircleOutline className="w-5 h-5 cursor-pointer" />
                   </div>
                 </div>
 
-                <div className="h-[540px] w-full overflow-y-auto scrollbar-thin scrollbar-thumb-white scrollbar-hide">
+                <div className="h-[530px] w-full overflow-y-auto scrollbar-thin scrollbar-thumb-white scrollbar-hide">
                   {messages.map((message) => (
                     <ChatContent
                       message={message.message}
@@ -124,6 +144,7 @@ function chat() {
                       file={message.file}
                       type={message.type}
                       timestamp={message.timestamp}
+                      search={searchState}
                       className="h-fit"
                     />
                   ))}

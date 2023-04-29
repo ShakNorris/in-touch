@@ -26,8 +26,6 @@ function SearchModal() {
     getUsers();
   }, []);
 
-  console.log(users);
-
   return (
     <>
       <Modal
