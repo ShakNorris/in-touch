@@ -64,7 +64,7 @@ function Sidebar() {
           >
             <img
               src={session?.user?.image}
-              alt={session.user.username.slice(0,2)}
+              alt={session?.user?.username.slice(0,2).toUpperCase()}
               className="h-7 w-7 rounded-full cursor-pointer object-cover"
             />
             <h3>Profile</h3>

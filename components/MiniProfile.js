@@ -9,7 +9,7 @@ function MiniProfile() {
     <div className="flex items-center justify-between mt-[-25px] ml-10">
       <img
         src={session?.user?.image}
-        alt="PFP"
+        alt={session?.user?.username.slice(0,2).toUpperCase()}
         className="w-14 h-14 rounded-full cursor-pointer object-cover border p-[2px]"
       />
 

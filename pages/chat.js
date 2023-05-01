@@ -10,6 +10,9 @@ import {
   orderBy,
   query,
   where,
+  getDoc,
+  updateDoc,
+  doc
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { GrSend } from "react-icons/gr";
@@ -23,6 +26,7 @@ import { useRouter } from "next/router";
 import ChatContent from "../components/ChatContent";
 import ChatInput from "../components/ChatInput";
 import { Popover, Input } from "@mantine/core";
+import UserInChat from "../components/UserInChat";
 
 function chat() {
   const [users, setUsers] = useState([]);
@@ -30,8 +34,8 @@ function chat() {
   const [messages, setMessages] = useState([]);
   const [searchState, setSearchState] = useState("");
   const { data: session } = useSession();
-  const router = useRouter();
   const [opened, setOpened] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     collection(db, "Users");
@@ -48,7 +52,7 @@ function chat() {
     });
   }, []);
 
-  const selectChat = (user) => {
+  const selectChat = async (user) => {
     setChat(user);
 
     const combinedId =
@@ -66,7 +70,17 @@ function chat() {
       });
       setMessages(messages);
     });
+
+    const docSnap = await getDoc(doc(db, "Messages", combinedId, "LastMsg", combinedId));
+    if (docSnap.data() && docSnap.data().user.uid !== session.user.uid) {
+      await updateDoc(doc(db, "Messages", combinedId, "LastMsg", combinedId), { unread: false });
+    }
   };
+
+  useEffect(() => {
+    const element = document.getElementById("scroll");
+    element?.scrollIntoView();
+  }, [messages]);
 
   return (
     <div className="">
@@ -81,19 +95,20 @@ function chat() {
         <div className="flex mt-3 grid-cols-5 w-[935px] h-[670px] shadow-sm border bg-white">
           <div className="col-span-2 w-[450px]">
             {users?.map((profile) => (
-              <div
-                key={profile.id}
-                onClick={() => selectChat(profile)}
-                className="flex items-center p-3 cursor-pointer hover:bg-gray-100"
-              >
-                <img
-                  className="w-12 h-12 rounded-full"
-                  src={profile.profileImg}
-                />
-                <h2 className="font-semibold text-md ml-2">
-                  {profile.username}
-                </h2>
-              </div>
+              // <div
+              //   key={profile.id}
+              //   onClick={() => selectChat(profile)}
+              //   className="flex items-center p-3 cursor-pointer hover:bg-gray-100"
+              // >
+              //   <img
+              //     className="w-12 h-12 rounded-full"
+              //     src={profile.profileImg}
+              //   />
+              //   <h2 className="font-semibold text-md ml-2">
+              //     {profile.username}
+              //   </h2>
+              // </div>
+              <UserInChat sessionUser={session?.user} user={profile} selectChat={() => selectChat(profile)}/>
             ))}
           </div>
           <div className="col-span-3 shadow-sm border-l w-full">
@@ -114,7 +129,13 @@ function chat() {
                   </div>
 
                   <div className="relative flex items-center">
-                    <Popover opened={opened} onChange={setOpened} position="bottom" withArrow shadow="md" >
+                    <Popover
+                      opened={opened}
+                      onChange={setOpened}
+                      position="bottom"
+                      withArrow
+                      shadow="md"
+                    >
                       <Popover.Target>
                         <IoSearch
                           onClick={() => setOpened((o) => !o)}
@@ -148,12 +169,13 @@ function chat() {
                       className="h-fit"
                     />
                   ))}
+                  <div id="scroll"></div>
                 </div>
 
                 <ChatInput
                   className="fixed bottom-0"
                   chat={chat}
-                  sessionUser={session.user}
+                  sessionUser={session?.user}
                 />
               </>
             ) : (

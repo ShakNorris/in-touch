@@ -23,11 +23,13 @@ import {
   Avatar,
   Image,
 } from "@mantine/core";
+import { useRouter } from "next/router";
 
 export default function login({ providers }) {
   const [hasAccount, setHasAccount] = useState(false);
   const [passwordModal, { open, close }] = useDisclosure(false);
   const { data: session } = useSession();
+  const router = useRouter();
 
   useEffect(() => {
     if (session) {

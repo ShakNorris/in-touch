@@ -12,7 +12,7 @@ function ChatContent({ message, user, file, type, timestamp, search }) {
   message = CryptoJS.TripleDES.decrypt(
     message,
     process.env.NEXT_PUBLIC_DES_KEY
-  ).toString(CryptoJS.enc.Latin1);
+  ).toString(CryptoJS.enc.Utf8);
 
   useEffect(() => {
     const DecryptFile = async () => {

@@ -10,6 +10,7 @@ import {
   serverTimestamp,
   getDoc,
   updateDoc,
+  setDoc,
 } from "firebase/firestore";
 import { ref, getDownloadURL, uploadString } from "firebase/storage";
 import { db, storage } from "../firebase";
@@ -74,6 +75,13 @@ function ChatInput({ chat, sessionUser }) {
           user: sessionUser,
           timestamp: serverTimestamp(),
           type: "message",
+        });
+        await setDoc(doc(db, "Messages", combinedId, "LastMsg", combinedId), {
+          message: encryptedMessage.toString(),
+          user: sessionUser,
+          timestamp: serverTimestamp(),
+          type: "message",
+          unread: true
         });
       }
     } catch (e) {

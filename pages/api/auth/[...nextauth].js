@@ -5,7 +5,7 @@ import connectMongo from "../../../database/conn";
 import Users from "../../../model/Schema";
 
 const bcrypt = require('bcryptjs');
-var provider = '';
+let provider = '';
 
 const signinUser = async ({ password, user }) => {
   if (!user.password) {
@@ -47,7 +47,10 @@ export const authOptions = {
   ],
   session: {
     strategy: "jwt",
-    maxAge: 3600,
+    maxAge: 60 * 60,
+  },
+  jwt: {
+    maxAge: 60 * 60, // 1 hour
   },
   pages: {
     signIn: "/auth/login",
@@ -63,22 +66,19 @@ export const authOptions = {
       return true;
     },
     async jwt({ user, token }) {
-      //   update token from user
-      if (user) {
+      if (user !== undefined) {
         token.user = user;
       }
-      //   return final_token
       return token;
     },
     async session({ session, token, user }) {
-      if(provider === 'google'){
-        session.user.username = session.user.name
-        .split(" ")
-        .join("")
-        .toLocaleLowerCase();
-        session.user.provider= 'google'
-      }
-
+      // if(provider === 'google'){
+      //   session.user.username = session.user.name
+      //   .split(" ")
+      //   .join("")
+      //   .toLocaleLowerCase();
+      //   session.user.provider= 'google'
+      // }
       if(provider === 'credentials'){
         session.user.name = token.user.firstname + ' ' + token.user.lastname;
         session.user.username = token.user.username;
