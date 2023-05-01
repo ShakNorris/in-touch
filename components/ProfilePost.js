@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import PostModal from "../components/PostModal";
+import PostModal from "./PostModal";
 import { useDisclosure } from "@mantine/hooks";
 import Image from "next/image";
 

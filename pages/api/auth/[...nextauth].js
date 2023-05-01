@@ -63,11 +63,15 @@ export const authOptions = {
       if (account.provider === 'credentials'){
         provider = 'credentials';
       }
+      
       return true;
     },
-    async jwt({ user, token }) {
+    async jwt({ user, token, account }) {
       if (user !== undefined) {
         token.user = user;
+      }
+      if (account) {
+        token.accessToken = account.access_token
       }
       return token;
     },

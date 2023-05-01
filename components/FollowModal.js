@@ -45,6 +45,9 @@ function FollowModal({ check, followers, following }) {
     <Modal opened={open} onClose={setOpen} withCloseButton={false} size="md">
       {check ? (
         <>
+          <h1 className="flex items-center justify-center text-lg mb-2 font-sans">
+            Followers
+          </h1>
           {followersList?.map((followers) => (
             <div
               onClick={() => {
@@ -52,7 +55,7 @@ function FollowModal({ check, followers, following }) {
                 setOpen(false);
               }}
               key={followers.id}
-              className="flex justify-between cursor-pointer hover:bg-gray-100"
+              className="flex justify-between cursor-pointer hover:bg-gray-100 mt-1"
             >
               <img
                 className="ml-2 w-10 h-10 rounded-full"
@@ -67,6 +70,9 @@ function FollowModal({ check, followers, following }) {
         </>
       ) : (
         <>
+          <h1 className="flex items-center justify-center text-lg mb-2 font-sans">
+            Following
+          </h1>
           {followingList?.map((following) => (
             <div
               onClick={() => {
@@ -74,7 +80,7 @@ function FollowModal({ check, followers, following }) {
                 setOpen(false);
               }}
               key={following.id}
-              className="flex justify-between cursor-pointer hover:bg-gray-100"
+              className="flex justify-between cursor-pointer hover:bg-gray-100 mt-1"
             >
               <img
                 className="ml-2 w-10 h-10 rounded-full"

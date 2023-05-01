@@ -37,21 +37,21 @@ function Header({ user, postAmount }) {
     if (hasFollowed) {
       return [
         await deleteDoc(
-          doc(db, "Users", session.user.uid, "Following", user.id)
+          doc(db, "Users", session?.user.uid, "Following", user.id)
         ),
         await deleteDoc(
-          doc(db, "Users", user.id, "Followers", session.user.uid)
+          doc(db, "Users", user.id, "Followers", session?.user.uid)
         ),
       ];
     } else {
       return [
-        await setDoc(doc(db, "Users", session.user.uid, "Following", user.id), {
+        await setDoc(doc(db, "Users", session?.user.uid, "Following", user.id), {
           username: user.username,
           id: user.id
         }),
-        await setDoc(doc(db, "Users", user.id, "Followers", session.user.uid), {
-          username: session.user.username,
-          id: session.user.uid
+        await setDoc(doc(db, "Users", user.id, "Followers", session?.user.uid), {
+          username: session?.user.username,
+          id: session?.user.uid
         }),
       ];
     }
@@ -60,7 +60,7 @@ function Header({ user, postAmount }) {
   useEffect(
     () =>
       setHasFollowed(
-        followers.findIndex((follows) => follows.id === session.user.uid) !== -1
+        followers.findIndex((follows) => follows.id === session?.user.uid) !== -1
       ),
     [followers]
   );
@@ -84,8 +84,8 @@ function Header({ user, postAmount }) {
   return (
     <div className="p-5 flex justify-center items-center shadow-sm border-b bg-white">
       <div className="mx-10">
-        <Image
-          className="inline rounded-full cursor-pointer object-cover border p-[2px] border-black"
+        <img
+          className="w-[150px] h-[150px] rounded-full inline cursor-pointer object-cover border p-[2px] border-black"
           src={`${user.profileImg}`}
           alt="profile"
           width={150}

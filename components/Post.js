@@ -25,10 +25,11 @@ import { db } from "../firebase";
 import Moment from "react-moment";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
-import PostModal from "../components/PostModal";
-import EditModal from "../components/EditModal";
+import PostModal from "./PostModal";
+import EditModal from "./EditModal";
+import LikeModal from "./LikeModal";
 import { useDisclosure } from "@mantine/hooks";
-import { Menu } from "@mantine/core";
+import { Modal, Menu } from "@mantine/core";
 
 function Post({ id, username, userImg, img, caption, timeStamp, fileType }) {
   const { data: session } = useSession();
@@ -39,6 +40,7 @@ function Post({ id, username, userImg, img, caption, timeStamp, fileType }) {
   const [showEmojis, setShowEmojis] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const [openEdit, handlers] = useDisclosure(false);
+  const [openLikes, likeHandler] = useDisclosure(false);
   const [decryptedFile, setDecryptedFile] = useState("");
 
   const commentRef = useRef(null);
@@ -104,6 +106,7 @@ function Post({ id, username, userImg, img, caption, timeStamp, fileType }) {
     if (hasLiked)
       return await deleteDoc(doc(db, "Posts", id, "Likes", session.user.uid));
     return await setDoc(doc(db, "Posts", id, "Likes", session.user.uid), {
+      id: session.user.uid,
       username: session.user.username,
     });
   };
@@ -253,12 +256,28 @@ function Post({ id, username, userImg, img, caption, timeStamp, fileType }) {
           <GrSend className="postBtn w-7" />
           {likes.length > 0 &&
             (likes.length > 1 ? (
-              <p className="pl-2 text-md text-gray-500">{likes.length} Likes</p>
+              <p
+                className="pl-2 text-md text-gray-500 cursor-pointer"
+                onClick={() => likeHandler.open(true)}
+              >
+                {likes.length} Likes
+              </p>
             ) : (
-              <p className="pl-2 text-md text-gray-500"> {likes.length} Like</p>
+              <p
+                className="pl-2 text-md text-gray-500 cursor-pointer"
+                onClick={() => likeHandler.open(true)}
+              >
+                {" "}
+                {likes.length} Like
+              </p>
             ))}
         </div>
 
+        <LikeModal
+          likes={likes}
+          opened={openLikes}
+          close={() => likeHandler.close()}
+        />
         <FaRegBookmark className="postBtn" />
       </div>
 
@@ -285,7 +304,7 @@ function Post({ id, username, userImg, img, caption, timeStamp, fileType }) {
                   {CryptoJS.TripleDES.decrypt(
                     comment.data().comment,
                     process.env.NEXT_PUBLIC_DES_KEY
-                  ).toString(CryptoJS.enc.Latin1)}
+                  ).toString(CryptoJS.enc.Utf8)}
                 </p>
                 <Moment className="pr-5 text-xs text-gray-400" fromNow>
                   {comment.data().timestamp?.toDate()}

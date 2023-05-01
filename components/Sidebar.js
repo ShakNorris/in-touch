@@ -11,7 +11,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/dist/client/router";
 import { useRecoilState } from "recoil";
 import { createModalState, searchModalState } from "../atoms/modalAtom";
-import OptionsModal from "../components/OptionsModal";
+import OptionsModal from "./OptionsModal";
 import { useDisclosure } from "@mantine/hooks";
 import { Menu, Burger } from "@mantine/core";
 import { signOut } from "next-auth/react";

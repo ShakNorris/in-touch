@@ -22,7 +22,8 @@ import {
 import { db, storage } from "../firebase";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
-import EditModal from "../components/EditModal";
+import EditModal from "./EditModal";
+import LikeModal from "./LikeModal";
 
 function PostModal({
   opened,
@@ -43,6 +44,7 @@ function PostModal({
   const [showEmojis, setShowEmojis] = useState(false);
   const [decryptedFile, setDecryptedFile] = useState("");
   const [openEdit, handlers] = useDisclosure(false);
+  const [openLikes, likeHandler] = useDisclosure(false);
 
   var CryptoJS = require("crypto-js");
 
@@ -98,8 +100,8 @@ function PostModal({
 
   const likePost = async () => {
     if (hasLiked)
-      return await deleteDoc(doc(db, "Posts", id, "Likes", session.user.uid));
-    return await setDoc(doc(db, "Posts", id, "Likes", session.user.uid), {
+      return await deleteDoc(doc(db, "Posts", id, "Likes", session?.user.uid));
+    return await setDoc(doc(db, "Posts", id, "Likes", session?.user.uid), {
       username: session.user.username,
     });
   };
@@ -111,7 +113,7 @@ function PostModal({
   useEffect(
     () =>
       setHasLiked(
-        likes.findIndex((like) => like.id === session.user.uid) !== -1
+        likes.findIndex((like) => like.id === session?.user.uid) !== -1
       ),
     [likes]
   );
@@ -242,7 +244,7 @@ function PostModal({
                           {CryptoJS.TripleDES.decrypt(
                             comment.data().comment,
                             process.env.NEXT_PUBLIC_DES_KEY
-                          ).toString(CryptoJS.enc.Latin1)}
+                          ).toString(CryptoJS.enc.Utf8)}
                         </p>
                         <Moment className="pr-5 text-xs text-gray-400" fromNow>
                           {comment.data().timestamp?.toDate()}
@@ -272,17 +274,27 @@ function PostModal({
                       />
                       {likes.length > 0 &&
                         (likes.length > 1 ? (
-                          <p className="pl-2 text-md text-gray-500">
-                            {" "}
+                          <p
+                            className="pl-2 text-md text-gray-500"
+                            onClick={() => likeHandler.open(true)}
+                          >
                             {likes.length} Likes
                           </p>
                         ) : (
-                          <p className="pl-2 text-md text-gray-500">
-                            {" "}
+                          <p
+                            className="pl-2 text-md text-gray-500"
+                            onClick={() => likeHandler.open(true)}
+                          >
                             {likes.length} Like
                           </p>
                         ))}
                     </div>
+
+                    <LikeModal
+                      likes={likes}
+                      opened={openLikes}
+                      close={() => likeHandler.close()}
+                    />
                   </div>
 
                   <form className="flex items-center w-full">

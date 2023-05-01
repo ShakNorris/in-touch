@@ -38,17 +38,19 @@ export default function Home() {
 export async function getServerSideProps(context) {
   const session = await getSession(context);
 
-  const user = await getDoc(doc(db, "Users", session?.user.uid));
+  if(session){
+    const user = await getDoc(doc(db, "Users", session?.user?.uid));
 
-  if (!user.exists()) {
-    setDoc(doc(db, "Users", session?.user.uid), {
-      email: session?.user.email,
-      profileImg: session?.user.image,
-      name: session?.user.name,
-      username: session?.user.username,
-      provider: session?.user.provider,
-      id: session?.user.uid,
-    });
+    if (!user?.exists()) {
+      await setDoc(doc(db, "Users", session?.user.uid), {
+        email: session?.user.email,
+        profileImg: session?.user.image,
+        name: session?.user.name,
+        username: session?.user.username,
+        provider: session?.user.provider,
+        id: session?.user.uid,
+      });
+    }
   }
 
   if (!session) {
