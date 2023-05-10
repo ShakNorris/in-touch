@@ -25,6 +25,7 @@ function Register() {
   const [successfulLogin, { open, close }] = useDisclosure(false);
   const [passwordShown, setPasswordShown] = useState(false);
   const [cpasswordShown, setCPasswordShown] = useState(false);
+  const [additionalErrors, setAdditionalErrors] = useState(null);
 
   async function onSubmit(values) {
     const options = {
@@ -35,15 +36,20 @@ function Register() {
 
     await fetch("/api/auth/signup", options)
       .then((res) => res.json())
-      .then((data) => {
-        if (data) console.log(data);
-      });
+      .then((data) => ({ body: data }))
+      .then((obj) => setAdditionalErrors(obj.body));
+    // .then((r) => r.json().then((data) => console.log(data)))
+    // .then((obj) => console.log(obj));
+    // .then((res) => res.json())
+    // .then((data) => {
+    //   if (data) console.log(data);
+    // });
 
-    if (options) {
+    if (options && additionalErrors.error == null) {
       open();
     }
   }
-
+  
   var strength = {
     0: "Bad",
     1: "Weak",
@@ -56,7 +62,8 @@ function Register() {
 
   return (
     <>
-      {(formik.errors.email ||
+      {(additionalErrors.error ||
+        formik.errors.email ||
         formik.errors.password ||
         formik.errors.firstname ||
         formik.errors.cpassword ||
@@ -72,6 +79,7 @@ function Register() {
                 />
               </HoverCard.Target>
               <HoverCard.Dropdown>
+                <Text size="sm">{additionalErrors?.error}</Text>
                 <Text size="sm">{formik.errors.firstname}</Text>
                 <Text size="sm">{formik.errors.lastname}</Text>
                 <Text size="sm">{formik.errors.username}</Text>
@@ -149,7 +157,9 @@ function Register() {
         {formik.values.password.length >= 1 && (
           <HoverCard width={280} shadow="md">
             <HoverCard.Target>
-              <p className="bold cursor-pointer">Strength: {strength[testPassword.score]}</p>
+              <p className="bold cursor-pointer">
+                Strength: {strength[testPassword.score]}
+              </p>
             </HoverCard.Target>
             <HoverCard.Dropdown>
               <Text size="sm">{testPassword.feedback.suggestions}</Text>

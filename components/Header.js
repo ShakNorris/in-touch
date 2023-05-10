@@ -20,7 +20,7 @@ import { BsCheck } from "react-icons/bs";
 import OptionsModal from "../components/OptionsModal";
 import { useDisclosure } from "@mantine/hooks";
 import FollowModal from "../components/FollowModal";
-import { Modal, Group, Button } from '@mantine/core';
+import { Modal, Group, Button } from "@mantine/core";
 import { followModalState } from "../atoms/modalAtom";
 import { useRecoilState } from "recoil";
 
@@ -32,7 +32,7 @@ function Header({ user, postAmount }) {
   const [settingsOpened, { open, close }] = useDisclosure(false);
   const [openFollow, setOpenFollow] = useRecoilState(followModalState);
   const [check, setCheck] = useState(false);
-  
+
   const FollowUser = async () => {
     if (hasFollowed) {
       return [
@@ -45,14 +45,20 @@ function Header({ user, postAmount }) {
       ];
     } else {
       return [
-        await setDoc(doc(db, "Users", session?.user.uid, "Following", user.id), {
-          username: user.username,
-          id: user.id
-        }),
-        await setDoc(doc(db, "Users", user.id, "Followers", session?.user.uid), {
-          username: session?.user.username,
-          id: session?.user.uid
-        }),
+        await setDoc(
+          doc(db, "Users", session?.user.uid, "Following", user.id),
+          {
+            username: user.username,
+            id: user.id,
+          }
+        ),
+        await setDoc(
+          doc(db, "Users", user.id, "Followers", session?.user.uid),
+          {
+            username: session?.user.username,
+            id: session?.user.uid,
+          }
+        ),
       ];
     }
   };
@@ -60,7 +66,8 @@ function Header({ user, postAmount }) {
   useEffect(
     () =>
       setHasFollowed(
-        followers.findIndex((follows) => follows.id === session?.user.uid) !== -1
+        followers.findIndex((follows) => follows.id === session?.user.uid) !==
+          -1
       ),
     [followers]
   );
@@ -124,24 +131,38 @@ function Header({ user, postAmount }) {
           <h4>{postAmount} Posts</h4>
           {followers.length >= 0 &&
             (followers.length > 1 ? (
-              <p onClick={() => {setOpenFollow(true); setCheck(true)}} className="pl-2 text-md cursor-pointer">
+              <p
+                onClick={() => {
+                  setOpenFollow(true);
+                  setCheck(true);
+                }}
+                className="pl-2 text-md cursor-pointer"
+              >
                 {likes.length} Followers
               </p>
             ) : (
-              <p onClick={() => {setOpenFollow(true); setCheck(true)}} className="pl-2 text-md cursor-pointer">
+              <p
+                onClick={() => {
+                  setOpenFollow(true);
+                  setCheck(true);
+                }}
+                className="pl-2 text-md cursor-pointer"
+              >
                 {followers.length} Follower
               </p>
             ))}
-          <h6 onClick={() => {setOpenFollow(true); setCheck(false)}} className="text-md cursor-pointer">
+          <h6
+            onClick={() => {
+              setOpenFollow(true);
+              setCheck(false);
+            }}
+            className="text-md cursor-pointer"
+          >
             {following.length} Following
           </h6>
         </div>
-
-        <div className="w-[300px] mt-3">
-          <p>{user.bio}</p>
-        </div>
+        <div className="mt-3 Bio">{user.bio}</div>
       </div>
-
       <IoSettingsOutline
         onClick={open}
         className="cursor-pointer ml-10"
@@ -149,7 +170,7 @@ function Header({ user, postAmount }) {
       />
 
       <OptionsModal opened={settingsOpened} close={close} />
-      <FollowModal check={check} followers={followers} following={following}/>
+      <FollowModal check={check} followers={followers} following={following} />
     </div>
   );
 }

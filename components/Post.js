@@ -30,6 +30,7 @@ import EditModal from "./EditModal";
 import LikeModal from "./LikeModal";
 import { useDisclosure } from "@mantine/hooks";
 import { Modal, Menu } from "@mantine/core";
+import { useRouter } from "next/router";
 
 function Post({ id, username, userImg, img, caption, timeStamp, fileType }) {
   const { data: session } = useSession();
@@ -42,6 +43,8 @@ function Post({ id, username, userImg, img, caption, timeStamp, fileType }) {
   const [openEdit, handlers] = useDisclosure(false);
   const [openLikes, likeHandler] = useDisclosure(false);
   const [decryptedFile, setDecryptedFile] = useState("");
+  const router = useRouter();
+
 
   const commentRef = useRef(null);
 
@@ -156,7 +159,7 @@ function Post({ id, username, userImg, img, caption, timeStamp, fileType }) {
           src={userImg}
           alt=""
         />
-        <p className="font-bold">{username}</p>
+        <p className="font-bold" onClick={() => router.push(`/${username}`)}>{username}</p>
         {videoTypes.includes(fileType) ? (
           <>
             <RxVideo className="h-8 w-8 pl-3" />

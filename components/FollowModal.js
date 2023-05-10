@@ -24,19 +24,19 @@ function FollowModal({ check, followers, following }) {
   }, []);
 
   const followingList = followingMap.map((following) => {
-    let userItem = users.find((user) => user.id === following.id);
+    let userItem = users?.find((user) => user.id === following.id);
 
-    following.profileImg = userItem.profileImg;
-    following.email = userItem.email;
+    following.profileImg = userItem?.profileImg;
+    following.email = userItem?.email;
 
     return following;
   });
 
   const followersList = followersMap.map((followers) => {
-    let userItem = users.find((user) => user.id === followers.id);
+    let userItem = users?.find((user) => user.id === followers.id);
 
-    followers.profileImg = userItem.profileImg;
-    followers.email = userItem.email;
+    followers.profileImg = userItem?.profileImg;
+    followers.email = userItem?.email;
 
     return followers;
   });

@@ -45,7 +45,7 @@ export default function login({ providers }) {
 
   const PasswordGenerator = () => {
     var tempPassword = generator.generate({
-      length: Math.floor(Math.random() * (12 - 8 + 1) + 8),
+      length: Math.floor(Math.random() * (18 - 14 + 1) + 14),
       numbers: true,
       strict: true,
     });

@@ -15,17 +15,17 @@ export default async function handleSignUp(req, res){
         const checkexisting = await Users.findOne({email});
         if(checkexisting) 
         {
-            return res.status(422).json({message: "This user already exists"});
+            return res.status(422).json({error: "This user already exists"});
         }
 
         //TODO: Hash the password
         // CreateUser({firstname, lastname, username, email, password});
         Users.create({firstname, lastname, username, email, password : await hash(password, 12)}, function(err, data){
-            if(err) return res.status(404).json({ err });
+            if(err) return res.status(404).json({ error:  err });
             res.status(201).json({ status : true, user: data})
         })
     }
     else{
-        res.status(500).json({message: "Something's not right here"})
+        res.status(500).json({error: "Something's not right here"})
     }
 }

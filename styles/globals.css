@@ -81,3 +81,9 @@
 .Button{
   background-image:inherit;
 }
+
+.Bio{
+  word-wrap: break-word; 
+  max-height: 300px;
+  max-width: 300px;
+}

@@ -3,17 +3,18 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import connectMongo from "../../../database/conn";
 import Users from "../../../model/Schema";
+import { SupabaseAdapter } from "@next-auth/supabase-adapter";
 
 const bcrypt = require('bcryptjs');
 let provider = '';
 
 const signinUser = async ({ password, user }) => {
   if (!user.password) {
-    throw new Error("Please enter password");
+    throw new Error("Please enter your password.");
   }
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    throw new Error("Password Incorrect.");
+    throw new Error("Your Password is Incorrect!");
   }
   return user;
 };
@@ -21,6 +22,10 @@ const signinUser = async ({ password, user }) => {
 
 export const authOptions = {
   // Configure one or more authentication providers
+  // adapter: SupabaseAdapter({
+  //   url: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  //   secret: process.env.SUPABASE_SERVICE_ROLE_KEY,
+  // }),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -36,7 +41,7 @@ export const authOptions = {
         const password = credentials.password;
         const user = await Users.findOne({ email });
         if (!user) {
-          throw new Error("You haven't registered yet");
+          throw new Error("You haven't registered yet!");
         }
 
         if (user) {
@@ -48,6 +53,7 @@ export const authOptions = {
   session: {
     strategy: "jwt",
     maxAge: 60 * 60,
+    updateAge: 24 * 60 * 60
   },
   jwt: {
     maxAge: 60 * 60, // 1 hour
@@ -67,7 +73,7 @@ export const authOptions = {
       return true;
     },
     async jwt({ user, token, account }) {
-      if (user !== undefined) {
+      if (user) {
         token.user = user;
       }
       if (account) {

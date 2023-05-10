@@ -4,29 +4,18 @@ import { useSession } from "next-auth/react";
 import { useFormik } from "formik";
 import { PasswordValidate } from "../lib/validate";
 import {
-  addDoc,
-  deleteDoc,
-  getDocs,
-  setDoc,
   doc,
-  query,
-  collection,
-  onSnapshot,
-  orderBy,
-  serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
 import { ref, getDownloadURL, uploadString } from "firebase/storage";
 import { db, storage } from "../firebase";
-import connectMongo from "../database/conn";
-import Users from "../model/Schema";
-import { hash } from "bcryptjs";
+
 
 function OptionsModal({ opened, close }) {
   const { data: session } = useSession();
   const [isCredentials, setIsCredentials] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-  let userBio = "";
+  const [userBio, setUserBio] = useState('');
 
   const CheckProvider = () => {
     if (session.user.provider == "credentials") {
@@ -47,18 +36,27 @@ function OptionsModal({ opened, close }) {
   });
 
   async function onSubmit(values) {
-    // const user = await Users.findOne(session.user.email);
-    // if (!user) {
-    //   console.log("user cant be found");
-    // }
-    // if (user) {
-    //   console.log(user);
-    // }
-  }
+    const options = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        currentpassword: values.currentpassword,
+        newpassword: values.newpassword,
+        cpassword: values.cpassword,
+        email: session?.user.email,
+      }),
+    };
 
-  const BioChange = (e) => {
-    userBio = e.target.value;
-  };
+    await fetch("/api/changepassword", options)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data) console.log(data);
+      });
+
+    if (options) {
+      console.log("Password was successfully changed");
+    }
+  }
 
   const changeBio = () => {
     updateDoc(doc(db, "Users", session.user.uid), {
@@ -67,6 +65,10 @@ function OptionsModal({ opened, close }) {
   };
 
   const ChangePicture = async (e) => {
+    if (e.size / 1000 ** 2 > 25) {
+      return alert("Your chosen file is too large :(");
+    }
+    
     const reader = new FileReader();
     if (e) {
       reader.readAsDataURL(e);
@@ -77,7 +79,6 @@ function OptionsModal({ opened, close }) {
     };
 
     console.log(selectedFile);
-
   };
 
   const UploadProfile = async () => {
@@ -91,13 +92,15 @@ function OptionsModal({ opened, close }) {
         });
       }
     );
-  }
 
-  const handleChangeBio = (e) => {
-    if (e.which === 13) {
-      changeBio();
-    }
+    alert("Your profile has been updated!")
   };
+
+  // const handleChangeBio = (e) => {
+  //   if (e.which === 13) {
+  //     changeBio();
+  //   }
+  // };
 
   return (
     <Modal opened={opened} onClose={close} withCloseButton={false} size="lg">
@@ -119,7 +122,10 @@ function OptionsModal({ opened, close }) {
                 accept="image/png,image/jpeg, image/jpg"
                 onChange={ChangePicture}
               />
-              <button onClick={UploadProfile} class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              <button
+                onClick={UploadProfile}
+                class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              >
                 Change Picture
               </button>
             </>
@@ -180,9 +186,15 @@ function OptionsModal({ opened, close }) {
           <p className="text-gray-500 mb-2">Enter your Bio here</p>
           <Textarea
             placeholder="Your Bio"
-            onChange={BioChange}
-            onKeyPress={handleChangeBio}
+            onChange={(e) => setUserBio(e.target.value)}
+            maxLength={150}
           />
+          <button
+            onClick={changeBio}
+            class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Change Bio
+          </button>
         </Tabs.Panel>
       </Tabs>
     </Modal>

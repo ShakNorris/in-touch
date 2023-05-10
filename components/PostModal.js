@@ -24,6 +24,7 @@ import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
 import EditModal from "./EditModal";
 import LikeModal from "./LikeModal";
+import { useRouter } from "next/router";
 
 function PostModal({
   opened,
@@ -45,6 +46,7 @@ function PostModal({
   const [decryptedFile, setDecryptedFile] = useState("");
   const [openEdit, handlers] = useDisclosure(false);
   const [openLikes, likeHandler] = useDisclosure(false);
+  const router = useRouter();
 
   var CryptoJS = require("crypto-js");
 
@@ -171,7 +173,7 @@ function PostModal({
                 src={userImg}
                 alt=""
               />
-              <p className="font-bold">{username}</p>
+              <p className="font-bold" onClick={() => router.push(`/${username}`)}>{username}</p>
               <Moment className="pl-2 text-sm text-gray-400 flex-1" fromNow>
                 {timeStamp?.toDate()}
               </Moment>
