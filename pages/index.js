@@ -17,8 +17,25 @@ import {
 } from "firebase/firestore";
 import { db, storage } from "../firebase";
 import PostModal from "../components/PostModal";
+import { useEffect } from "react";
 
 export default function Home() {
+
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const user = await getDoc(doc(db, "Users", session?.user?.uid));
+     
+      if(user){
+        session.user.image = user.data().profileImg
+      }
+    }
+    fetchUser()
+    console.log(session.user.image)
+  }, [])
+
+
   return (
     <div className="">
       <Head>

@@ -25,16 +25,21 @@ function Authorize() {
   });
 
   async function onSubmit(values) {
-    const res = await signIn("credentials", {
+    const status = await signIn("credentials", {
       redirect: false,
       email: values.email,
       password: values.password,
       callbackUrl: "/",
-    }).then((r) => {
-      setCounter(++counter);
-      setAdditionalError(r);
+    }).then((res) => {
+      if(res.error){
+        setCounter(++counter);
+        setAdditionalError(res);
+      }
+      if(res.ok){
+        router.push('/')
+        router.reload()
+      }
     });
-    if (res.ok) router.push(res.url);
   }
 
   return (

@@ -86,7 +86,7 @@ function UploadModal() {
 
   const addFileToPost = (e) => {
     if (e.files[0].size / 1000 ** 2 > 25) {
-      return alert("Your chosen file is too large :(");
+      return alert("Your chosen file is too large, make sure it's less than 25 MB");
     }
 
     if (acceptedVideoType.includes(e.files[0].type)) {

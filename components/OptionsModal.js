@@ -3,19 +3,16 @@ import { Modal, Tabs, Textarea, FileInput } from "@mantine/core";
 import { useSession } from "next-auth/react";
 import { useFormik } from "formik";
 import { PasswordValidate } from "../lib/validate";
-import {
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import { ref, getDownloadURL, uploadString } from "firebase/storage";
 import { db, storage } from "../firebase";
-
 
 function OptionsModal({ opened, close }) {
   const { data: session } = useSession();
   const [isCredentials, setIsCredentials] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [userBio, setUserBio] = useState('');
+  const [additionalError, setAdditionalError] = useState(null);
+  const [userBio, setUserBio] = useState("");
 
   const CheckProvider = () => {
     if (session.user.provider == "credentials") {
@@ -49,11 +46,10 @@ function OptionsModal({ opened, close }) {
 
     await fetch("/api/changepassword", options)
       .then((res) => res.json())
-      .then((data) => {
-        if (data) console.log(data);
-      });
+      .then((data) => ({ body: data }))
+      .then((obj) => setAdditionalError(obj.body));
 
-    if (options) {
+    if (options && additionalError == null) {
       console.log("Password was successfully changed");
     }
   }
@@ -66,9 +62,11 @@ function OptionsModal({ opened, close }) {
 
   const ChangePicture = async (e) => {
     if (e.size / 1000 ** 2 > 25) {
-      return alert("Your chosen file is too large :(");
+      return alert(
+        "Your chosen file is too large, make sure it's less than 25 MB"
+      );
     }
-    
+
     const reader = new FileReader();
     if (e) {
       reader.readAsDataURL(e);
@@ -93,7 +91,7 @@ function OptionsModal({ opened, close }) {
       }
     );
 
-    alert("Your profile has been updated!")
+    alert("Your profile has been updated!");
   };
 
   // const handleChangeBio = (e) => {
@@ -142,6 +140,28 @@ function OptionsModal({ opened, close }) {
         <Tabs.Panel value="password" pl="xs">
           {isCredentials ? (
             <>
+              {(additionalError?.error ||
+                formik.errors.email ||
+                formik.errors.password ||
+                formik.errors.firstname ||
+                formik.errors.cpassword ||
+                formik.errors.lastname ||
+                formik.errors.username) && (
+                <div
+                  className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 mb-2"
+                  role="alert"
+                >
+                  <p class="font-bold">Warning</p>
+                  <p>{additionalError?.error}</p>
+                  <p>{formik.errors.firstname}</p>
+                  <p>{formik.errors.lastname}</p>
+                  <p>{formik.errors.username}</p>
+                  <p>{formik.errors.email}</p>
+                  <p>{formik.errors.password}</p>
+                  <p>{formik.errors.cpassword}</p>
+                  <p>WTF</p>
+                </div>
+                )}
               <form
                 className="flex flex-col gap-1"
                 onSubmit={formik.handleSubmit}

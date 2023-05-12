@@ -93,7 +93,7 @@ function ChatInput({ chat, sessionUser }) {
   const getFile = (e) => {
     if (e.files[0]) {
       if (e.files[0].size / 1000 ** 2 > 25) {
-        return alert("Your chosen file is too large :(");
+        return alert("Your chosen file is too large, make sure it's less than 25 MB");
       }
 
       const reader = new FileReader();
