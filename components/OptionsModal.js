@@ -15,7 +15,7 @@ function OptionsModal({ opened, close }) {
   const [userBio, setUserBio] = useState("");
 
   const CheckProvider = () => {
-    if (session.user.provider == "credentials") {
+    if (session?.user.provider == "credentials") {
       setIsCredentials(true);
     }
   };
@@ -55,7 +55,7 @@ function OptionsModal({ opened, close }) {
   }
 
   const changeBio = () => {
-    updateDoc(doc(db, "Users", session.user.uid), {
+    updateDoc(doc(db, "Users", session?.user.uid), {
       bio: userBio,
     });
   };
@@ -85,7 +85,7 @@ function OptionsModal({ opened, close }) {
     await uploadString(imageRef, selectedFile, "data_url").then(
       async (snapshot) => {
         const downloadURL = await getDownloadURL(imageRef);
-        await updateDoc(doc(db, "Users", session.user.uid), {
+        await updateDoc(doc(db, "Users", session?.user.uid), {
           profileImg: downloadURL,
         });
       }
@@ -159,7 +159,6 @@ function OptionsModal({ opened, close }) {
                   <p>{formik.errors.email}</p>
                   <p>{formik.errors.password}</p>
                   <p>{formik.errors.cpassword}</p>
-                  <p>WTF</p>
                 </div>
                 )}
               <form

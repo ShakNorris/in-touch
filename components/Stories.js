@@ -27,7 +27,7 @@ function Stories() {
     overflow-x-scroll scrollbar-thin scrollbar-thumb-white scrollbar-hide"
     >
       {session && (
-        <Story img={session.user.image} username={session.user.username} />
+        <Story img={session?.user.image} username={session?.user.username} />
       )}
       {users.map((profile) => (
         <Story

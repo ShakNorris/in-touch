@@ -29,7 +29,7 @@ function LikeModal({ opened, close, likes }) {
   });
 
   return (
-    <Modal centered opened={opened} onClose={close} withCloseButton={false} size="md">
+    <Modal centered opened={opened} onClose={close} size="md">
       <>
         <h1 className="flex items-center justify-center text-lg mb-2 font-sans">
           Likes

@@ -62,7 +62,7 @@ function Register() {
 
   return (
     <>
-      {(additionalErrors.error ||
+      {(additionalErrors?.error ||
         formik.errors.email ||
         formik.errors.password ||
         formik.errors.firstname ||
