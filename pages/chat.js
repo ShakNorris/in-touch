@@ -92,7 +92,7 @@ function chat() {
       <Sidebar />
 
       <div className="flex justify-center">
-        <div className="flex mt-3 grid-cols-5 w-[935px] h-[670px] shadow-sm border bg-white">
+        <div className="flex grid-cols-5 w-full h-screen shadow-sm border bg-white">
           <div className="col-span-2 w-[450px]">
             {users?.map((profile) => (
               // <div

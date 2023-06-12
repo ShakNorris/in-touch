@@ -66,7 +66,7 @@ export async function getServerSideProps(context) {
         profileImg: session?.user.image,
         name: session?.user.name,
         username: session?.user.username,
-        provider: session?.user.provider,
+        provider: session?.provider,
         id: session?.user.uid,
       });
     }
