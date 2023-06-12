@@ -3,30 +3,15 @@ import Head from "next/head";
 import style from "../../styles/authen.module.css";
 import { useState, useEffect } from "react";
 import { useSession, getSession } from "next-auth/react";
-import {
-  addDoc,
-  collection,
-  doc,
-  serverTimestamp,
-  updateDoc,
-} from "firebase/firestore";
-import { db, storage } from "../../firebase";
-import Register from "../../components/Register";
-import Authorize from "../../components/Authorize";
 import { useDisclosure } from "@mantine/hooks";
-import {
-  Modal,
-  Group,
-  Button,
-  HoverCard,
-  Text,
-  Avatar,
-  Image,
-} from "@mantine/core";
 import { useRouter } from "next/router";
+import { FcGoogle } from "react-icons/fc";
+import { FaGithub } from "react-icons/fa";
+import { AiOutlineMail } from "react-icons/ai";
+import {SiAuth0} from 'react-icons/si'
 
 export default function login({ providers }) {
-  const [hasAccount, setHasAccount] = useState(false);
+  const [email, setEmail] = useState(null);
   const [passwordModal, { open, close }] = useDisclosure(false);
   const { data: session } = useSession();
   const router = useRouter();
@@ -57,6 +42,19 @@ export default function login({ providers }) {
     signIn("google", { callbackUrl: "/" });
   }
 
+  async function handleGithubSignin() {
+    signIn("github", { callbackUrl: "/" });
+  }
+
+  async function handleEmailSignin() {
+    signIn("email", { email: email });
+  }
+
+  async function handleAuth0Signin() {
+    signIn("auth0", { callbackUrl: "/" });
+  }
+
+
   return (
     <>
       <Head>
@@ -70,82 +68,74 @@ export default function login({ providers }) {
             <div></div>
           </div>
           <div className="right flex flex-col justify-evenly">
-            
             <div className="text-center py-10">
               <section className="w-3/4 mx-auto flex flex-col">
                 <h2 className={style.loginName}>InTouch</h2>
-                {hasAccount ? (
-                  <>
-                    <Register />
-                    <Modal
-                      opened={passwordModal}
-                      onClose={close}
-                      title="Password Generator"
-                      centered
-                    >
-                      Your Generated Password is - {generatedPassword}
-                    </Modal>
-
-                    <Group position="center">
-                      <Button
-                        className="mt-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4"
-                        onClick={PasswordGenerator}
+                {/* {providers &&
+                  !!Object.keys(providers).length &&
+                  Object.values(providers).map((provider) => (
+                    <div key={provider.name}>
+                      <button
+                        className={style.providerBtn}
+                        type="button"
+                        onClick={() =>
+                          signIn(provider.id, { callbackUrl: "/" })
+                        }
                       >
-                        Generate Password
-                      </Button>
-                    </Group>
-                  </>
-                ) : (
-                  <>
-                    <Authorize />
-                    <button
-                      className={style.providerBtn}
-                      type="button"
-                      onClick={handleGoogleSignin}
-                    >
-                      Sign in with Google
-                    </button>
-                    {/* {providers &&
-                      !!Object.keys(providers).length &&
-                      Object.values(providers).map((provider) => (
-                        <div key={provider.name}>
-                          <button
-                            className={style.providerBtn}
-                            type="button"
-                            onClick={() =>
-                              signIn(provider.id, { callbackUrl: "/" })
-                            }
-                          >
-                            Sign in with {provider.name}
-                          </button>
-                        </div>
-                      ))} */}
-                  </>
-                )}
+                        Sign in with {provider.name}
+                      </button>
+                    </div>
+                  ))} */}
+
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <div>
+                  <button
+                    type="button"
+                    onClick={handleEmailSignin}
+                    className={style.providerBtn}
+                  >
+                    Sign In with Email
+                    <AiOutlineMail className="h-5 w-5 ml-1" />
+                  </button>
+                </div>
+
+                <div className="mt-5">
+                  <button
+                    type="button"
+                    onClick={handleGoogleSignin}
+                    className={style.providerBtn}
+                  >
+                    Sign In with Google <FcGoogle className="h-5 w-5 ml-1" />
+                  </button>
+                </div>
+
+                <div>
+                  <button
+                    type="button"
+                    onClick={handleGithubSignin}
+                    className={style.providerBtn}
+                  >
+                    Sign In with Github
+                    <FaGithub className="h-5 w-5 ml-1" />
+                  </button>
+                </div>
+
+                <div>
+                  <button
+                    type="button"
+                    onClick={handleAuth0Signin}
+                    className={style.providerBtn}
+                  >
+                    Sign In with Auth0
+                    <SiAuth0 className="h-5 w-5 ml-1" />
+                  </button>
+                </div>
               </section>
-              <p className="text-center text-gray-500 mt-4">
-                {hasAccount ? (
-                  <>
-                    Already registered?{" "}
-                    <a
-                      className="text-blue-500 cursor-pointer"
-                      onClick={() => setHasAccount(!hasAccount)}
-                    >
-                      Sign In
-                    </a>
-                  </>
-                ) : (
-                  <>
-                    Don't have an Account?{" "}
-                    <a
-                      className="text-blue-500 cursor-pointer"
-                      onClick={() => setHasAccount(!hasAccount)}
-                    >
-                      Sign Up
-                    </a>
-                  </>
-                )}
-              </p>
             </div>
           </div>
         </div>

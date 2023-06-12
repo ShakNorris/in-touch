@@ -76,13 +76,13 @@ function ChatContent({ message, user, file, type, timestamp, search }) {
           <div className="ml-3 flex items-center mt-3">
             <img
               className="w-8 h-8 rounded-full"
-              src={user.image}
-              alt={user.username.slice(0, 2)}
+              src={user?.image}
+              alt={user?.username?.slice(0, 2)}
             />
 
             <div className="flex-1 ml-3">
               <div className="flex text-sm">
-                <p className="text-gray-900">{user.username}</p>
+                <p className="text-gray-900">{user?.username}</p>
                 <Moment class="text-gray-500 ml-2" fromNow>
                   {timestamp?.toDate()}
                 </Moment>

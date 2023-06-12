@@ -23,12 +23,14 @@ export default function Home() {
 
   const { data: session } = useSession();
 
+  console.log(session)
+
   useEffect(() => {
     const fetchUser = async () => {
       const user = await getDoc(doc(db, "Users", session?.user?.uid));
      
       if(user){
-        session.user.image = user.data().profileImg
+        session.user.image = user?.data()?.profileImg
       }
     }
     fetchUser()

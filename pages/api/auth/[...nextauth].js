@@ -1,59 +1,49 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import CredentialsProvider from "next-auth/providers/credentials";
-import connectMongo from "../../../database/conn";
-import Users from "../../../model/Schema";
-import { SupabaseAdapter } from "@next-auth/supabase-adapter";
-
-const bcrypt = require('bcryptjs');
-let provider = '';
-
-const signinUser = async ({ password, user }) => {
-  if (!user.password) {
-    throw new Error("Please enter your password.");
-  }
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    throw new Error("Your Password is Incorrect!");
-  }
-  return user;
-};
-
+import GitHubProvider from 'next-auth/providers/github';
+import EmailProvider from 'next-auth/providers/email'
+import Auth0Provider from "next-auth/providers/auth0";
+import { FirestoreAdapter } from "@next-auth/firebase-adapter";
+import { cert } from "firebase-admin/app";
 
 export const authOptions = {
-  // Configure one or more authentication providers
-  // adapter: SupabaseAdapter({
-  //   url: process.env.NEXT_PUBLIC_SUPABASE_URL,
-  //   secret: process.env.SUPABASE_SERVICE_ROLE_KEY,
-  // }),
+  adapter: FirestoreAdapter({
+    credential: cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY,
+    }),
+  }),
   providers: [
+    EmailProvider({
+      server: {
+        host: process.env.EMAIL_SERVER_HOST,
+        port: process.env.EMAIL_SERVER_PORT,
+        auth: {
+          user: process.env.EMAIL_SERVER_USER,
+          pass: process.env.EMAIL_SERVER_PASSWORD,
+        }
+      },
+      from: process.env.EMAIL_FROM
+    }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
-    CredentialsProvider({
-      async authorize(credentials, req) {
-        connectMongo().catch((error) => {
-          error: "Connection Failed...!";
-        });
-
-        const email = credentials.email;
-        const password = credentials.password;
-        const user = await Users.findOne({ email });
-        if (!user) {
-          throw new Error("You haven't registered yet!");
-        }
-
-        if (user) {
-          return signinUser({ password, user });
-        }
-      },
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID,
+      clientSecret: process.env.GITHUB_SECRET
     }),
+    Auth0Provider({
+      clientId: process.env.AUTH0_CLIENT_ID,
+      clientSecret: process.env.AUTH0_CLIENT_SECRET,
+      issuer: process.env.AUTH0_ISSUER
+    })
   ],
   session: {
     strategy: "jwt",
     maxAge: 60 * 60,
-    updateAge: 24 * 60 * 60
+    updateAge: 24 * 60 * 60,
   },
   jwt: {
     maxAge: 60 * 60, // 1 hour
@@ -63,13 +53,6 @@ export const authOptions = {
   },
   callbacks: {
     async signIn({ account, user }) {
-      if (account.provider === "google") {
-        provider = 'google';
-      }
-      if (account.provider === 'credentials'){
-        provider = 'credentials';
-      }
-      
       return true;
     },
     async jwt({ user, token, account }) {
@@ -77,35 +60,21 @@ export const authOptions = {
         token.user = user;
       }
       if (account) {
-        token.accessToken = account.access_token
+        token.accessToken = account.access_token;
+        token.provider = account.provider;
       }
       return token;
     },
     async session({ session, token, user }) {
-      // if(provider === 'google'){
-      //   session.user.username = session.user.name
-      //   .split(" ")
-      //   .join("")
-      //   .toLocaleLowerCase();
-      //   session.user.provider= 'google'
-      // }
-      if(provider === 'credentials'){
-        session.user.name = token.user.firstname + ' ' + token.user.lastname;
-        session.user.username = token.user.username;
-        session.user.image = `http://gravatar.com/avatar/?d=mp`;
-        session.user.provider = 'credentials'
-      }
-      else{
-        session.user.username = session.user.name
+      session.user.username = session.user.name
         .split(" ")
         .join("")
         .toLocaleLowerCase();
-        session.user.provider = 'other';
-      }
-      
+
+      session.provider = token.provider;
       session.user.uid = token.sub;
       session.user.accessToken = token.accessToken;
-      
+
       return session;
     },
   },
