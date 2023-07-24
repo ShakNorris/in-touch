@@ -3,7 +3,6 @@ import PostModal from "./PostModal";
 import { useDisclosure } from "@mantine/hooks";
 import Image from "next/image";
 
-
 function ProfilePost({post}) {
     const videoTypes = ["video/mp4", "video/mov", "video/avi"];
 

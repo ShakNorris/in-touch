@@ -1,9 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useRecoilState } from "recoil";
 import { searchModalState } from "../atoms/modalAtom";
-import { BsCamera } from "react-icons/bs";
 import { db, storage } from "../firebase";
-import { useSession } from "next-auth/react";
 import { getDocs } from "firebase/firestore";
 import { AiOutlineSearch } from "react-icons/ai";
 import { Modal, Input } from "@mantine/core";

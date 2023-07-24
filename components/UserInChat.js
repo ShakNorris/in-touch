@@ -28,7 +28,7 @@ function UserInChat({ sessionUser, user, selectChat }) {
       className="relative flex items-center p-3 cursor-pointer hover:bg-gray-100"
     >
       <div className="">
-        <img className="w-[60px] h-[60px] rounded-full" src={user.profileImg} />
+        <img className="w-[50px] h-[50px] rounded-full" src={user.profileImg} />
       </div>
       <div className="ml-2">
         <h2 className="font-semibold text-md ">{user.username}</h2>

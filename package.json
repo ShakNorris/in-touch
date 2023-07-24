@@ -14,8 +14,6 @@
     "@mantine/hooks": "^6.0.8",
     "@mantine/next": "^6.0.8",
     "@next-auth/firebase-adapter": "^2.0.1",
-    "@next-auth/supabase-adapter": "^0.2.1",
-    "@supabase/supabase-js": "^2.21.0",
     "bcryptjs": "^2.4.3",
     "crypto-js": "^4.1.1",
     "emoji-mart": "^5.5.2",

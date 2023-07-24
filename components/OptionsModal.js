@@ -7,9 +7,8 @@ import { db, storage } from "../firebase";
 
 function OptionsModal({ opened, close }) {
   const { data: session } = useSession();
-  const [selectedFile, setSelectedFile] = useState(null);
+  // const [selectedFile, setSelectedFile] = useState(null);
   const [userBio, setUserBio] = useState("");
-
 
   const changeBio = () => {
     updateDoc(doc(db, "Users", session?.user.uid), {
@@ -17,49 +16,49 @@ function OptionsModal({ opened, close }) {
     });
   };
 
-  const ChangePicture = async (e) => {
-    if (e.size / 1000 ** 2 > 25) {
-      return alert(
-        "Your chosen file is too large, make sure it's less than 25 MB"
-      );
-    }
+  // const ChangePicture = async (e) => {
+  //   if (e.size / 1000 ** 2 > 25) {
+  //     return alert(
+  //       "Your chosen file is too large, make sure it's less than 25 MB"
+  //     );
+  //   }
 
-    const reader = new FileReader();
-    if (e) {
-      reader.readAsDataURL(e);
-    }
+  //   const reader = new FileReader();
+  //   if (e) {
+  //     reader.readAsDataURL(e);
+  //   }
 
-    reader.onload = (readerEvent) => {
-      setSelectedFile(readerEvent.target.result);
-    };
+  //   reader.onload = (readerEvent) => {
+  //     setSelectedFile(readerEvent.target.result);
+  //   };
 
-    console.log(selectedFile);
-  };
+  //   console.log(selectedFile);
+  // };
 
-  const UploadProfile = async () => {
-    const imageRef = ref(storage, `Users/image`);
+  // const UploadProfile = async () => {
+  //   const imageRef = ref(storage, `Users/image`);
 
-    await uploadString(imageRef, selectedFile, "data_url").then(
-      async (snapshot) => {
-        const downloadURL = await getDownloadURL(imageRef);
-        await updateDoc(doc(db, "Users", session?.user.uid), {
-          profileImg: downloadURL,
-        });
-      }
-    );
+  //   await uploadString(imageRef, selectedFile, "data_url").then(
+  //     async (snapshot) => {
+  //       const downloadURL = await getDownloadURL(imageRef);
+  //       await updateDoc(doc(db, "Users", session?.user.uid), {
+  //         profileImg: downloadURL,
+  //       });
+  //     }
+  //   );
 
-    alert("Your profile has been updated!");
-  };
+  //   alert("Your profile has been updated!");
+  // };
 
   return (
     <Modal opened={opened} onClose={close} withCloseButton={false} size="lg">
       <Tabs color="green" orientation="vertical" defaultValue="gallery">
         <Tabs.List>
           <Tabs.Tab value="bio">Bio</Tabs.Tab>
-          <Tabs.Tab value="pfp">Change Profile Picture</Tabs.Tab>
+          {/* <Tabs.Tab value="pfp">Change Profile Picture</Tabs.Tab> */}
         </Tabs.List>
 
-        <Tabs.Panel value="pfp" pl="xs">
+        {/* <Tabs.Panel value="pfp" pl="xs">
           <p className="text-gray-500 mb-2">Update your profile picture</p>
           <FileInput
             placeholder="Upload your pfp"
@@ -72,7 +71,7 @@ function OptionsModal({ opened, close }) {
           >
             Change Picture
           </button>
-        </Tabs.Panel>
+        </Tabs.Panel> */}
 
         <Tabs.Panel value="bio" pl="xs">
           <p className="text-gray-500 mb-2">Enter your Bio here</p>

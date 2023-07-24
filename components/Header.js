@@ -20,7 +20,6 @@ import { BsCheck } from "react-icons/bs";
 import OptionsModal from "../components/OptionsModal";
 import { useDisclosure } from "@mantine/hooks";
 import FollowModal from "../components/FollowModal";
-import { Modal, Group, Button } from "@mantine/core";
 import { followModalState } from "../atoms/modalAtom";
 import { useRecoilState } from "recoil";
 
